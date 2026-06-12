@@ -2,13 +2,14 @@ import { Composio } from '@composio/core';
 import type { Alert, PostAlert } from '@farmacovigia/shared';
 
 // === Contrato B → A: postAlert ===
-// Publica una alerta vía Composio (Slack por defecto, Gmail opcional).
+// Publica una alerta vía Composio usando Gmail.
 // Plan B en vivo: si DRY_RUN=true o Composio falla, imprime en consola y sigue.
+// Nota: el env se lee de forma perezosa (dentro de las funciones) porque este
+// módulo se importa antes de que el consumidor cargue dotenv.
 
-const DRY_RUN = process.env.DRY_RUN === 'true';
-const USER_ID = process.env.COMPOSIO_USER_ID || 'default';
-const SLACK_CHANNEL = process.env.COMPOSIO_SLACK_CHANNEL || '#general';
-const GMAIL_TO = process.env.COMPOSIO_GMAIL_TO || '';
+const dryRun = () => process.env.DRY_RUN === 'true';
+const userId = () => process.env.COMPOSIO_USER_ID || 'default';
+const gmailTo = () => process.env.COMPOSIO_GMAIL_TO || '';
 
 let _composio: Composio | null = null;
 function composio(): Composio {
@@ -21,7 +22,7 @@ function composio(): Composio {
 function renderConsole(alert: Alert): void {
   const prov = alert.provenance.map((p) => `  - ${p.url}`).join('\n');
   console.log(
-    `\n📣 [postAlert:${alert.channel}] ${alert.title}\n${alert.body}\n` +
+    `\n📣 [postAlert:gmail] ${alert.title}\n${alert.body}\n` +
       (prov ? `Fuentes:\n${prov}\n` : ''),
   );
 }
@@ -32,20 +33,8 @@ interface ExecResult {
   successful: boolean;
 }
 
-async function sendSlack(alert: Alert): Promise<ExecResult> {
-  const text =
-    `*${alert.title}*\n${alert.body}` +
-    (alert.provenance.length
-      ? `\n\nFuentes:\n${alert.provenance.map((p) => `• ${p.url}`).join('\n')}`
-      : '');
-  return composio().tools.execute('SLACK_SEND_MESSAGE', {
-    userId: USER_ID,
-    arguments: { channel: SLACK_CHANNEL, message: text },
-  }) as Promise<ExecResult>;
-}
-
 async function sendGmail(alert: Alert): Promise<ExecResult> {
-  const to = GMAIL_TO;
+  const to = gmailTo();
   if (!to) throw new Error('COMPOSIO_GMAIL_TO no configurado');
   const body =
     `${alert.body}\n\n` +
@@ -53,32 +42,31 @@ async function sendGmail(alert: Alert): Promise<ExecResult> {
       ? `Fuentes:\n${alert.provenance.map((p) => p.url).join('\n')}`
       : '');
   return composio().tools.execute('GMAIL_SEND_EMAIL', {
-    userId: USER_ID,
+    userId: userId(),
     arguments: { recipient_email: to, subject: alert.title, body },
   }) as Promise<ExecResult>;
 }
 
 // Intenta extraer un id útil del payload sin romper si el shape cambia.
-function extractRef(res: ExecResult, channel: string): string {
+function extractRef(res: ExecResult): string {
   const d = res?.data ?? {};
-  const id = (d.ts as string) || (d.id as string) || (d.messageId as string);
-  return id ? `${channel}:${id}` : `${channel}:ok`;
+  const id = (d.id as string) || (d.messageId as string) || (d.threadId as string);
+  return id ? `gmail:${id}` : `gmail:ok`;
 }
 
 export const postAlert: PostAlert = async (alert: Alert) => {
-  if (DRY_RUN) {
+  if (dryRun()) {
     renderConsole(alert);
-    return { ok: true, ref: `dry-run:${alert.channel}` };
+    return { ok: true, ref: `dry-run:gmail` };
   }
   try {
-    const res =
-      alert.channel === 'gmail' ? await sendGmail(alert) : await sendSlack(alert);
+    const res = await sendGmail(alert);
     if (res.successful === false) {
       console.error(`[postAlert] Composio respondió error:`, res.error);
       renderConsole(alert);
       return { ok: false, ref: `error:${res.error ?? 'unknown'}` };
     }
-    return { ok: true, ref: extractRef(res, alert.channel) };
+    return { ok: true, ref: extractRef(res) };
   } catch (err) {
     // Fallback en vivo: nunca tumbar la demo por una integración externa.
     console.error(`[postAlert] Composio falló, fallback a consola:`, err);

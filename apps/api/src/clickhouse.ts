@@ -45,11 +45,17 @@ export async function initSchema(): Promise<void> {
     console.warn('[clickhouse] CLICKHOUSE_URL vacío — usando respaldo en memoria.');
     return;
   }
-  const sql = readFileSync(SCHEMA_PATH, 'utf8');
+  const raw = readFileSync(SCHEMA_PATH, 'utf8');
+  // Quita líneas de comentario antes de partir por ';' (si no, un bloque que
+  // empieza con '--' se filtraría entero y el CREATE no se ejecutaría).
+  const sql = raw
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('--'))
+    .join('\n');
   const statements = sql
     .split(';')
     .map((s) => s.trim())
-    .filter((s) => s && !s.startsWith('--'));
+    .filter(Boolean);
   for (const stmt of statements) {
     await getClient().command({ query: stmt });
   }
