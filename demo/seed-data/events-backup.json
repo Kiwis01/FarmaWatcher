@@ -2,7 +2,7 @@
   {
     "ts": "2026-06-12 17:40:02",
     "kind": "recall_detected",
-    "payload": "{\"patientId\":\"PX-001\",\"drug\":\"Losartan\",\"recallId\":\"D-0573-2019\",\"classification\":\"II\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0573-2019%22\"}"
+    "payload": "{\"patientId\":\"PX-001\",\"drug\":\"Losartan\",\"recallId\":\"D-1455-2019\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: impurity for N-Nitroso-N-methyl-4-aminobutyric acid (NMBA) detected in the active pharmaceutical ingredient (API) used to manufacture finished products.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-1455-2019%22\"}"
   },
   {
     "ts": "2026-06-12 17:40:03",
@@ -12,7 +12,7 @@
   {
     "ts": "2026-06-12 17:40:05",
     "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-001\",\"chars\":372,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-001).\\nSe detectó un retiro activo de la FDA en tu medicamento Losartan: recall D-0573-2019 (Clase II) por la impureza NMBA por encima del límite aceptable. La Clase II indica un riesgo de salud relevante. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+    "payload": "{\"patientId\":\"PX-001\",\"chars\":531,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-001).\\nLa FDA reporta un retiro activo de tu medicamento Losartán: Teva retiró 2,924,000 tabletas (recall D-1455-2019, Clase II) porque se detectó la impureza NMBA en el ingrediente activo. La Clase II indica riesgo moderado: daño temporal o reversible, daño grave improbable. Revisa el número de lote en tu empaque (por ejemplo 1169752A o GS017387). IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para confirmar tu lote y valorar alternativas.\"}"
   },
   {
     "ts": "2026-06-12 17:40:06",
@@ -22,7 +22,7 @@
   {
     "ts": "2026-06-12 17:40:09",
     "kind": "recall_detected",
-    "payload": "{\"patientId\":\"PX-002\",\"drug\":\"Metformin\",\"recallId\":\"D-1924-2020\",\"classification\":\"II\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-1924-2020%22\"}"
+    "payload": "{\"patientId\":\"PX-002\",\"drug\":\"Metformin\",\"recallId\":\"D-1349-2020\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: FDA analysis detected N-Nitrosodimethylamine (NDMA) impurity above the acceptable intake level\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-1349-2020%22\"}"
   },
   {
     "ts": "2026-06-12 17:40:10",
@@ -32,7 +32,7 @@
   {
     "ts": "2026-06-12 17:40:12",
     "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-002\",\"chars\":368,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-002).\\nSe detectó un retiro activo de la FDA en tu medicamento Metformin: recall D-1924-2020 (Clase II) por la presencia de NDMA por encima del límite establecido. La Clase II indica un riesgo de salud relevante. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+    "payload": "{\"patientId\":\"PX-002\",\"chars\":488,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-002).\\nTu Metformina de liberación prolongada 750 mg (Amneal) tiene un retiro activo de la FDA: recall D-1349-2020, Clase II, por presencia de la impureza NDMA por encima del límite aceptable. Afecta a más de 50 lotes (códigos que inician con AM18, AM19 y AM20). No dejes de tomar tu metformina sin hablar antes con tu médico: suspender el tratamiento puede ser más riesgoso que la impureza. Lleva tu frasco a la farmacia para verificar el lote.\"}"
   },
   {
     "ts": "2026-06-12 17:40:13",
@@ -42,40 +42,45 @@
   {
     "ts": "2026-06-12 17:40:16",
     "kind": "recall_detected",
-    "payload": "{\"patientId\":\"PX-004\",\"drug\":\"Ranitidine\",\"recallId\":\"D-2150-2019\",\"classification\":\"I\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-2150-2019%22\"}"
+    "payload": "{\"patientId\":\"PX-004\",\"drug\":\"Ranitidine\",\"recallId\":\"D-0632-2020\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Impurity N-nitrosodimethylamine (NDMA) found in API\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0632-2020%22\"}"
   },
   {
     "ts": "2026-06-12 17:40:17",
-    "kind": "patient_matched",
-    "payload": "{\"patientId\":\"PX-004\",\"name\":\"Carlos Hernández\",\"drugs\":[\"Ranitidine\"]}"
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-004\",\"drug\":\"Clonazepam\",\"recallId\":\"D-0179-2025\",\"classification\":\"I\",\"reason\":\"Labeling: Label Error on Declared Strength; Some cartons were incorrectly labeled. The blister strips inside the product carton reflect the correct strength.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0179-2025%22\"}"
   },
   {
-    "ts": "2026-06-12 17:40:19",
-    "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-004\",\"chars\":404,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-004).\\nSe detectó un retiro activo de la FDA en tu medicamento Ranitidine: recall D-2150-2019 (Clase I) por contaminación con NDMA, un probable carcinógeno humano. La Clase I es la más grave. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta cuanto antes a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+    "ts": "2026-06-12 17:40:18",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-004\",\"name\":\"Carlos Hernández\",\"drugs\":[\"Ranitidine\",\"Clonazepam\"]}"
   },
   {
     "ts": "2026-06-12 17:40:20",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-004\",\"chars\":549,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-004).\\nTienes DOS retiros activos. 1) Clonazepam tabletas 0.125 mg (Endo/PAR): recall D-0179-2025, Clase I — la más grave — por un error de etiqueta: algunas cajas indican una dosis que no es la real; el blíster interior muestra la dosis correcta (lote 550174101). Verifica caja y blíster antes de tu próxima toma. 2) Ranitidina 150 mg (Granules India): recall D-0632-2020, Clase II, por la impureza NDMA. No suspendas ninguno por tu cuenta: llama hoy a tu médico o farmacéutico con tus empaques a la mano.\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:21",
     "kind": "alert_sent",
     "payload": "{\"patientId\":\"PX-004\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run\"}"
   },
   {
-    "ts": "2026-06-12 17:40:23",
+    "ts": "2026-06-12 17:40:24",
     "kind": "recall_detected",
-    "payload": "{\"patientId\":\"PX-005\",\"drug\":\"Valsartan\",\"recallId\":\"D-1010-2018\",\"classification\":\"II\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-1010-2018%22\"}"
+    "payload": "{\"patientId\":\"PX-005\",\"drug\":\"Valsartan\",\"recallId\":\"D-0303-2019\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: FDA laboratory testing confirmed presence of an impurity, N-nitrosodimethylamine (NDEA) in product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0303-2019%22\"}"
   },
   {
-    "ts": "2026-06-12 17:40:24",
+    "ts": "2026-06-12 17:40:25",
     "kind": "patient_matched",
     "payload": "{\"patientId\":\"PX-005\",\"name\":\"Lucía Torres\",\"drugs\":[\"Valsartan\"]}"
   },
   {
-    "ts": "2026-06-12 17:40:26",
+    "ts": "2026-06-12 17:40:27",
     "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-005\",\"chars\":366,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-005).\\nSe detectó un retiro activo de la FDA en tu medicamento Valsartan: recall D-1010-2018 (Clase II) por la impureza NDMA en el ingrediente activo. La Clase II indica un riesgo de salud relevante. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+    "payload": "{\"patientId\":\"PX-005\",\"chars\":519,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-005).\\nTu Amlodipino/Valsartán 5/160 mg (Teva) tiene un retiro activo de la FDA: recall D-0303-2019, Clase II, porque pruebas de laboratorio confirmaron la impureza NDEA. Se retiraron 120,394 frascos distribuidos en todo EUA y Puerto Rico. Lotes afectados: 23X017 a 23X024 (NDC 0093-7690-56 y 0093-7690-98). Revisa tu frasco: si tu lote aparece, tu farmacia puede cambiarlo. No suspendas el tratamiento sin consultar a tu médico: controlar tu presión sigue siendo prioritario.\"}"
   },
   {
-    "ts": "2026-06-12 17:40:27",
+    "ts": "2026-06-12 17:40:28",
     "kind": "alert_sent",
     "payload": "{\"patientId\":\"PX-005\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run\"}"
   }

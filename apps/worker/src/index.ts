@@ -33,6 +33,7 @@ async function runOnce(): Promise<number> {
           drug: drug.input,
           recallId: recall.recallId,
           classification: recall.classification,
+          reason: recall.reason,
           status: recall.status,
           sourceUrl: recall.sourceUrl,
         });

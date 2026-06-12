@@ -1,5 +1,5 @@
 {
-  "name": "@farmavigia/shared",
+  "name": "@farmavigia/notifier",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,5 +11,13 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     }
+  },
+  "scripts": {
+    "demo": "tsx src/demo.ts"
+  },
+  "dependencies": {
+    "@composio/core": "^0.1.0",
+    "@farmavigia/shared": "*",
+    "dotenv": "^16.4.5"
   }
 }

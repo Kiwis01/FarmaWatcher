@@ -9,6 +9,7 @@
     "build": "tsc --noEmit"
   },
   "dependencies": {
+    "@farmavigia/notifier": "*",
     "@farmavigia/shared": "*",
     "@farmavigia/sources": "*"
   }
