@@ -157,7 +157,53 @@ export function fetchRecallDetail(id: string): Promise<RecallDetailResult | null
   return p;
 }
 
-/* ── Normalización: del dato crudo de la FDA a lenguaje llano ────────── */
+/* ── Cable openFDA: últimos recalls publicados, registro o no ────────── */
+
+export interface WireRecall extends RecallDetail {
+  openfda?: {
+    brand_name?: string[];
+    generic_name?: string[];
+    substance_name?: string[];
+  };
+}
+
+export interface RecallWireResult {
+  source: "seed" | "openfda";
+  recalls: WireRecall[];
+}
+
+/** Los últimos recalls que publicó la FDA (con fixture local como respaldo). */
+export async function fetchRecallWire(): Promise<RecallWireResult> {
+  const r = await fetch("/api/recalls/latest", {
+    cache: "no-store",
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!r.ok) throw new Error("API " + r.status);
+  return (await r.json()) as RecallWireResult;
+}
+
+/** URL de provenance del registro (misma forma que produce el worker). */
+export function recallSourceUrl(recallNumber: string): string {
+  return `https://api.fda.gov/drug/enforcement.json?search=recall_number:%22${encodeURIComponent(recallNumber)}%22`;
+}
+
+/** "LOSARTAN POTASSIUM" -> "Losartan Potassium" (los nombres openFDA gritan). */
+function unshout(s: string): string {
+  if (s !== s.toUpperCase()) return s;
+  return s.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase());
+}
+
+/** Nombre corto del fármaco de un recall: openfda primero, descripción después. */
+export function recallDrugName(r: WireRecall): string {
+  const named =
+    r.openfda?.generic_name?.[0] ?? r.openfda?.brand_name?.[0] ?? r.openfda?.substance_name?.[0];
+  if (named) return unshout(named.trim());
+  const desc = clean(r.product_description) ?? "";
+  // El nombre suele venir antes de la dosis/presentación: cortamos en la coma o el "mg".
+  const head = desc.split(/,|\d+\s*(?:mg|mcg|ml)\b/i)[0]?.trim() ?? "";
+  const short = head.length > 44 ? `${head.slice(0, 44).trimEnd()}…` : head;
+  return short ? unshout(short) : "Unidentified drug";
+}
 
 /** Limpia valores tipo "N/A" / "unknown" / vacío -> null. */
 export function clean(v?: string): string | null {

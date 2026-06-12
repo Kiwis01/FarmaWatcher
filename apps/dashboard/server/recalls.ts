@@ -46,6 +46,52 @@ export function isValidRecallId(id: string): boolean {
   return /^[\w.-]{1,40}$/.test(id);
 }
 
+/* ── Cable openFDA: los últimos recalls publicados, con o sin paciente ── */
+
+export interface LatestRecallsResult {
+  source: "seed" | "openfda";
+  recalls: RecallRecord[];
+}
+
+// La FDA publica el enforcement report semanalmente: 10 min de caché sobra
+// para una pantalla en vivo sin acercarse al rate limit.
+const WIRE_OK_TTL_MS = 10 * 60 * 1000;
+const WIRE_FAIL_TTL_MS = 60 * 1000;
+let wireCache: { at: number; value: LatestRecallsResult } | null = null;
+
+function seedAsLatest(limit: number): LatestRecallsResult {
+  const rows = [...seed().values()]
+    .sort((a, b) => String(b.report_date ?? "").localeCompare(String(a.report_date ?? "")))
+    .slice(0, limit);
+  return { source: "seed", recalls: rows };
+}
+
+export async function getLatestRecalls(limit = 12): Promise<LatestRecallsResult> {
+  if (wireCache) {
+    const ttl = wireCache.value.source === "openfda" ? WIRE_OK_TTL_MS : WIRE_FAIL_TTL_MS;
+    if (Date.now() - wireCache.at < ttl) return wireCache.value;
+  }
+
+  let value: LatestRecallsResult | null = null;
+  try {
+    const key = process.env.OPENFDA_API_KEY;
+    const auth = key ? `&api_key=${encodeURIComponent(key)}` : "";
+    const url =
+      `${openFdaBase()}/drug/enforcement.json` +
+      `?sort=report_date:desc&limit=${limit}${auth}`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (res.ok) {
+      const data = (await res.json()) as { results?: RecallRecord[] };
+      if (data.results?.length) value = { source: "openfda", recalls: data.results };
+    }
+  } catch {
+    // Offline o timeout: degradamos al fixture local.
+  }
+  if (!value) value = seedAsLatest(limit);
+  wireCache = { at: Date.now(), value };
+  return value;
+}
+
 export async function getRecallDetail(id: string): Promise<RecallDetailResult | null> {
   const local = seed().get(id);
   if (local) return { source: "seed", record: local };

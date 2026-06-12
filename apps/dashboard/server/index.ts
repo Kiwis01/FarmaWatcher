@@ -4,7 +4,15 @@ import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadEnv } from "./env";
 import { fetchEvents } from "./clickhouse";
-import { getRecallDetail, isValidRecallId } from "./recalls";
+import { getLatestRecalls, getRecallDetail, isValidRecallId } from "./recalls";
+import {
+  addPatient,
+  checkDrug,
+  isValidDrugQuery,
+  loadRegistry,
+  readJsonBody,
+  validateNewPatient,
+} from "./registry";
 
 loadEnv();
 
@@ -70,6 +78,15 @@ const server = createServer(async (req, res) => {
       res.end(JSON.stringify(data));
       return;
     }
+    if (url.startsWith("/api/recalls/latest")) {
+      const data = await getLatestRecalls();
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+      });
+      res.end(JSON.stringify(data));
+      return;
+    }
     if (url.startsWith("/api/recall/")) {
       const id = decodeURIComponent(url.slice("/api/recall/".length).split("?")[0] ?? "");
       if (!isValidRecallId(id)) {
@@ -88,6 +105,49 @@ const server = createServer(async (req, res) => {
         "Cache-Control": "public, max-age=300",
       });
       res.end(JSON.stringify(detail));
+      return;
+    }
+    if (url.startsWith("/api/drug-check")) {
+      const name = new URL(url, "http://localhost").searchParams.get("name")?.trim() ?? "";
+      if (!isValidDrugQuery(name)) {
+        res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: "invalid medication name" }));
+        return;
+      }
+      const data = await checkDrug(name);
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+      });
+      res.end(JSON.stringify(data));
+      return;
+    }
+    if ((url.split("?")[0] ?? "") === "/api/patients") {
+      if (req.method === "POST") {
+        let body: unknown;
+        try {
+          body = await readJsonBody(req);
+        } catch (e) {
+          res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({ error: (e as Error).message }));
+          return;
+        }
+        const valid = validateNewPatient(body);
+        if (typeof valid === "string") {
+          res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
+          res.end(JSON.stringify({ error: valid }));
+          return;
+        }
+        const patient = addPatient(valid.name, valid.drugs);
+        res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ patient }));
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+      });
+      res.end(JSON.stringify(loadRegistry()));
       return;
     }
     if (url.startsWith("/healthz")) {

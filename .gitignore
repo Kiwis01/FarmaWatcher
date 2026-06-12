@@ -3,6 +3,8 @@ dist/
 *.tsbuildinfo
 .env
 .env.local
+# Config MCP local — lleva API key de Render, no se versiona
+.mcp.json
 *.log
 .DS_Store
 

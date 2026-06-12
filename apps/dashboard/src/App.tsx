@@ -22,12 +22,17 @@ import {
   plainBulletin,
   wordsOf,
   clean,
+  fetchRecallWire,
+  recallDrugName,
+  recallSourceUrl,
   type EventsResult,
   type EventPayload,
   type EventRow,
   type DetailState,
   type RecallDetail,
+  type RecallWireResult,
 } from "./lib";
+import AddPatient from "./AddPatient";
 
 const KIND_KEYS = ["recall_detected", "patient_matched", "bulletin_generated", "alert_sent"];
 
@@ -129,6 +134,7 @@ export default function App() {
   const [patientFilter, setPatientFilter] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, DetailState>>({});
   const [openRecall, setOpenRecall] = useState<string | null>(null);
+  const [wire, setWire] = useState<RecallWireResult | null>(null);
   const autoOpened = useRef(false);
 
   // Revelado escalonado solo en la primera carga; las filas nuevas entran sin retraso.
@@ -163,6 +169,23 @@ export default function App() {
     if (data) firstBatch.current = false;
     if (delays.current.size > 2000) delays.current.clear();
   }, [data]);
+
+  // El cable openFDA: el server cachea 10 min, así que el poll puede ser lento.
+  useEffect(() => {
+    let alive = true;
+    const load = () =>
+      fetchRecallWire()
+        .then((res) => {
+          if (alive && res.recalls?.length) setWire(res);
+        })
+        .catch(() => {});
+    load();
+    const timer = setInterval(load, 10 * 60 * 1000);
+    return () => {
+      alive = false;
+      clearInterval(timer);
+    };
+  }, []);
 
   const events = useMemo(() => {
     // Dedup por fila completa: el modo continuo re-inserta pasadas idénticas.
@@ -269,6 +292,18 @@ export default function App() {
       (a, b) => rank(a.worst) - rank(b.worst),
     );
   }, [events]);
+
+  // Lo que sabemos del padrón vía eventos: fármacos de pacientes y recalls ya cruzados.
+  const registryDrugs = useMemo(() => {
+    const s = new Set<string>();
+    for (const p of patients) for (const d of p.drugs) s.add(d.toLowerCase());
+    return s;
+  }, [patients]);
+
+  const matchedRecallIds = useMemo(
+    () => new Set(recallCards.map((c) => c.id)),
+    [recallCards],
+  );
 
   const classCounts = useMemo(() => {
     const c: Record<string, number> = { I: 0, II: 0, III: 0 };
@@ -485,6 +520,15 @@ export default function App() {
           </section>
 
           <section>
+            <h2>FDA wire · all drugs</h2>
+            <p className="wire-note">
+              The latest recalls published by the FDA — every drug, whether or not a
+              registry patient takes it.
+            </p>
+            <FdaWire wire={wire} registryDrugs={registryDrugs} matchedIds={matchedRecallIds} />
+          </section>
+
+          <section>
             <h2>Patients affected</h2>
             {patients.length === 0 ? (
               <p className="empty">None yet — the agent is watching.</p>
@@ -511,6 +555,8 @@ export default function App() {
               </ul>
             )}
           </section>
+
+          <AddPatient />
 
           <section>
             <h2>Patient bulletins · Claude</h2>
@@ -771,6 +817,75 @@ function RecallDossier({
         </div>
       </div>
     </article>
+  );
+}
+
+/**
+ * El cable openFDA: los últimos recalls publicados por la FDA, tomen o no
+ * nuestros pacientes el fármaco. Los que sí cruzan con el padrón se marcan.
+ */
+function FdaWire({
+  wire,
+  registryDrugs,
+  matchedIds,
+}: {
+  wire: RecallWireResult | null;
+  registryDrugs: Set<string>;
+  matchedIds: Set<string>;
+}) {
+  if (!wire) return <p className="empty">Reaching openFDA…</p>;
+
+  const drugs = [...registryDrugs];
+  return (
+    <>
+      <ol className="wire">
+        {wire.recalls.map((r) => {
+          const cls = classOf(r.classification);
+          const drug = recallDrugName(r);
+          const hay = `${drug} ${r.product_description ?? ""}`.toLowerCase();
+          const inRegistry =
+            matchedIds.has(r.recall_number) || drugs.some((d) => hay.includes(d));
+          const why = reasonGist(r.reason_for_recall) ?? clean(r.reason_for_recall);
+          const meta = [fmtFdaDate(r.report_date), clean(r.recalling_firm)]
+            .filter(Boolean)
+            .join(" · ");
+          return (
+            <li key={r.recall_number} className="wr">
+              <span className={`rn rn-${cls}`} title={CLASS_META[cls].def}>
+                {cls}
+              </span>
+              <div className="wr-body">
+                <div className="wr-line">
+                  <a
+                    className="wr-drug"
+                    href={recallSourceUrl(r.recall_number)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {drug}
+                  </a>
+                  {inRegistry && (
+                    <span
+                      className="wr-hit"
+                      title="A registry patient takes this drug — see Active recalls."
+                    >
+                      registry
+                    </span>
+                  )}
+                </div>
+                {why && <p className="wr-why">{why}</p>}
+                {meta && <div className="wr-meta">{meta}</div>}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      <p className="wire-src">
+        {wire.source === "openfda"
+          ? "Live from openFDA · refreshed every 10 min"
+          : "openFDA unreachable — showing the local record set"}
+      </p>
+    </>
   );
 }
 

@@ -97,6 +97,8 @@ button {
 .rc-note,
 .rc-src,
 .lname,
+.wr-meta,
+.wire-src,
 .rail h2 {
   font-family: var(--font-mono);
   text-transform: uppercase;
@@ -142,8 +144,14 @@ button {
 .rail section:nth-child(3) {
   animation-delay: 0.36s;
 }
+.rail section:nth-child(4) {
+  animation-delay: 0.42s;
+}
+.rail section:nth-child(5) {
+  animation-delay: 0.48s;
+}
 .creds {
-  animation: rise 0.6s var(--ease) 0.44s backwards;
+  animation: rise 0.6s var(--ease) 0.5s backwards;
 }
 
 /* ── Cabecera ────────────────────────────────────────────── */
@@ -877,6 +885,102 @@ button.lot:hover {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Cable openFDA: todos los fármacos, no solo el padrón ── */
+.wire-note {
+  margin: 0 0 14px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  max-width: 38ch;
+}
+
+.wire {
+  list-style: none;
+  margin: 0;
+  padding: 0 6px 0 0;
+  border-top: 1px solid var(--line);
+  max-height: 420px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-2) transparent;
+}
+.wire::-webkit-scrollbar {
+  width: 6px;
+}
+.wire::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 3px;
+}
+
+.wr {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.wr .rn {
+  padding-top: 2px;
+}
+
+.wr-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.wr-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.wr-drug {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--ink);
+  text-decoration: none;
+}
+.wr-drug:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--ink-3);
+  text-underline-offset: 3px;
+}
+
+/* El cruce con el padrón: la ficha que conecta el cable con los dossiers */
+.wr-hit {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.wr-why {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wr-meta {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.wire-src {
+  margin: 12px 0 0;
+  color: var(--ink-3);
+}
+
 /* ── Pacientes ───────────────────────────────────────────── */
 .patients {
   list-style: none;
@@ -1128,6 +1232,198 @@ button.lot:hover {
   .tl li::after {
     display: none;
   }
+}
+
+/* ── Alta de pacientes (verificación FDA previa) ─────────── */
+.addp {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.addp input {
+  width: 100%;
+  background: var(--raise);
+  color: var(--ink);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12.5px;
+}
+.addp input::placeholder {
+  color: var(--ink-3);
+}
+.drugrow {
+  display: flex;
+  gap: 8px;
+}
+.drugrow input {
+  flex: 1;
+  min-width: 0;
+}
+.btn {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 10px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--line-2);
+  background: none;
+  color: var(--ink-2);
+  white-space: nowrap;
+  transition:
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    background 0.2s var(--ease);
+}
+.btn:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.btn.solid {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: transparent;
+}
+.btn.solid:hover:not(:disabled) {
+  background: var(--ink-2);
+}
+.btn.danger {
+  background: var(--red);
+  border-color: transparent;
+  color: oklch(0.97 0.01 30);
+}
+.btn.danger:hover:not(:disabled) {
+  background: oklch(0.59 0.2 28);
+  color: oklch(0.97 0.01 30);
+}
+.dchips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  padding: 4px 8px 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+.dchip .rn {
+  width: 15px;
+  height: 15px;
+  font-size: 8.5px;
+}
+.dchip .x {
+  border: 0;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 2px;
+}
+.dchip .x:hover {
+  color: var(--ink);
+}
+.addp-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.addp-note.warn {
+  color: var(--amber);
+}
+.addp-hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* El modal de recall activo: una decisión, sin adornos */
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: oklch(0.12 0.005 35 / 0.66);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  animation: fade 0.25s var(--ease) backwards;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+.sheet {
+  width: min(440px, 100%);
+  background: var(--raise-2);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  padding: 22px 24px;
+  animation: rise 0.35s var(--ease) backwards;
+}
+.gate-cap {
+  margin: 0;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-size: 10px;
+  color: var(--amber);
+}
+.sheet h3 {
+  font-family: var(--font-display);
+  font-weight: 350;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  margin: 8px 0 12px;
+}
+.gate-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+}
+.gate-risk {
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.gate-def {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.gate-why {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+}
+.gate-rec {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin: 0 0 16px;
+}
+.gate-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.gate-foot {
+  margin: 14px 0 0;
+  font-size: 11px;
+  color: var(--ink-3);
 }
 
 /* ── Movimiento reducido ─────────────────────────────────── */

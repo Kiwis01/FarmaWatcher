@@ -1,13 +1,86 @@
 [
-  { "id": "PX-001", "name": "Margaret Collins", "drugs": ["Losartan", "Aspirin"] },
-  { "id": "PX-002", "name": "James Porter", "drugs": ["Metformin", "Atorvastatin"] },
-  { "id": "PX-003", "name": "Anna Reed", "drugs": ["Ibuprofen"] },
-  { "id": "PX-004", "name": "Charles Hendricks", "drugs": ["Ranitidine", "Omeprazole", "Clonazepam"] },
-  { "id": "PX-005", "name": "Lucy Tanner", "drugs": ["Valsartan"] },
-  { "id": "PX-006", "name": "Emily Carter", "drugs": ["Duloxetine"] },
-  { "id": "PX-007", "name": "Daniel Whitfield", "drugs": ["Levothyroxine", "Lisinopril"] },
-  { "id": "PX-008", "name": "Sophie Bennett", "drugs": ["Bupropion", "Sertraline"] },
-  { "id": "PX-009", "name": "Marcus Hale", "drugs": ["Hydrochlorothiazide"] },
-  { "id": "PX-010", "name": "Grace Liu", "drugs": ["Montelukast", "Prednisone"] },
-  { "id": "PX-011", "name": "Robert Hayes", "drugs": ["Amlodipine"] }
+  {
+    "id": "PX-001",
+    "name": "Margaret Collins",
+    "drugs": [
+      "Losartan",
+      "Aspirin"
+    ]
+  },
+  {
+    "id": "PX-002",
+    "name": "James Porter",
+    "drugs": [
+      "Metformin",
+      "Atorvastatin"
+    ]
+  },
+  {
+    "id": "PX-003",
+    "name": "Anna Reed",
+    "drugs": [
+      "Ibuprofen"
+    ]
+  },
+  {
+    "id": "PX-004",
+    "name": "Charles Hendricks",
+    "drugs": [
+      "Ranitidine",
+      "Omeprazole",
+      "Clonazepam"
+    ]
+  },
+  {
+    "id": "PX-005",
+    "name": "Lucy Tanner",
+    "drugs": [
+      "Valsartan"
+    ]
+  },
+  {
+    "id": "PX-006",
+    "name": "Emily Carter",
+    "drugs": [
+      "Duloxetine"
+    ]
+  },
+  {
+    "id": "PX-007",
+    "name": "Daniel Whitfield",
+    "drugs": [
+      "Levothyroxine",
+      "Lisinopril"
+    ]
+  },
+  {
+    "id": "PX-008",
+    "name": "Sophie Bennett",
+    "drugs": [
+      "Bupropion",
+      "Sertraline"
+    ]
+  },
+  {
+    "id": "PX-009",
+    "name": "Marcus Hale",
+    "drugs": [
+      "Hydrochlorothiazide"
+    ]
+  },
+  {
+    "id": "PX-010",
+    "name": "Grace Liu",
+    "drugs": [
+      "Montelukast",
+      "Prednisone"
+    ]
+  },
+  {
+    "id": "PX-011",
+    "name": "Robert Hayes",
+    "drugs": [
+      "Amlodipine"
+    ]
+  }
 ]
