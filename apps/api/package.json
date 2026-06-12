@@ -1,0 +1,21 @@
+{
+  "name": "@farmacovigia/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@clickhouse/client": "^1.7.0",
+    "@farmacovigia/notifier": "*",
+    "@farmacovigia/shared": "*",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21"
+  }
+}

@@ -1,6 +1,8 @@
 {
   "files": [],
   "references": [
-    { "path": "packages/shared" }
+    { "path": "packages/shared" },
+    { "path": "packages/notifier" },
+    { "path": "apps/api" }
   ]
 }
