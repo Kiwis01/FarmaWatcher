@@ -1,49 +1,53 @@
-# FarmacoVigía — Plan de trabajo para 2 personas
+# FarmacoVigía — Demo de 2 horas (2 personas)
 
-> Principio: dividir por la **costura con menos archivos compartidos**. Persona A construye el *agente clínico* (worker + dominio). Persona B construye los *rieles de dinero* (API x402 + publicación + deploy). Se tocan solo a través de 2 funciones y 1 esquema de ClickHouse, congelados en el commit inicial.
+> Principio: un solo flujo end-to-end que **siempre funciona en vivo** porque es determinista (recall sembrado). Persona A construye el *agente clínico* (worker + dominio + LLM). Persona B construye los *rieles* (API + ClickHouse + Composio + Render). Se tocan solo a través de 2 funciones y 1 tabla de ClickHouse, congeladas en el commit inicial.
+>
+> **Sin AWS. Sin crypto.** Sponsors objetivo: **TrueFoundry** (AI Gateway), **Composio** (Slack/Gmail), **ClickHouse** (base de datos), **Render** (deploy del backend).
+
+## La narrativa del demo (lo que ven los jueces)
+
+Un agente de farmacovigilancia que **vigila los retiros de medicamentos de la FDA** (openFDA), los **cruza contra un padrón sintético de pacientes**, y cuando un paciente toma un fármaco retirado:
+
+1. Genera un **boletín en español claro** con Claude → vía el **AI Gateway de TrueFoundry**.
+2. **Empuja la alerta a Slack/Gmail** → vía **Composio**.
+3. **Registra cada evento en ClickHouse**.
+4. Todo vive en una **URL de Render** con un mini-dashboard de eventos.
 
 ## Quién es quién
 
-| | Rama | Misión | Perfil ideal |
+| | Rama | Misión | Carpetas propias |
 |---|---|---|---|
-| **Persona A** | `feat/agente-clinico` | El agente que vigila, cruza y actúa | Quien conoce el dominio salud/NestJS (Carlos) |
-| **Persona B** | `feat/rieles-dinero` | Que el dinero se mueva y el demo viva en una URL | Quien no le tema a wallets/deploy |
+| **Persona A** | `feat/agente-clinico` | El agente que vigila, cruza y redacta | `apps/worker/`, `packages/sources/`, `demo/seed-data/` |
+| **Persona B** | `feat/rieles` | API + datos + notificación + que viva en una URL | `apps/api/`, `packages/notifier/`, `analytics/dashboard/`, `render.yaml` |
 
-*(Si tu compañero sabe crypto, intercambien.)*
-
-## Mapa de propiedad — nadie edita las carpetas del otro
-
-| Carpeta | Dueño |
+| Compartido (congelado en M0) | Dueño |
 |---|---|
-| `apps/worker/`, `packages/rxnorm/`, `packages/sources/`, `airbyte/`, `analytics/schema.sql`, `demo/seed-data/` | **A** |
-| `apps/api/`, `packages/publisher/`, `demo/buyer/`, `analytics/dashboard/`, `render.yaml` | **B** |
-| `packages/shared/` (tipos), `.env.example`, `package.json` raíz, CI | **Congelado en M0** — cambios solo de a dos, commit directo a `main` |
+| `packages/shared/` (tipos), `analytics/schema.sql`, `.env.example`, `package.json` raíz, CI | **Cambios solo de a dos, commit directo a `main`** |
 
-Cada package tiene su propio `package.json` (workspaces): así las dependencias nuevas de A y B no chocan en el mismo archivo. El lockfile lo regenera quien mergea segundo en cada punto M.
+Cada package tiene su propio `package.json` (workspaces) para que las dependencias de A y B no choquen. El lockfile lo regenera quien mergea segundo.
 
-## El contrato (se commitea a `main` en M0, antes de branchear)
+## El contrato (commiteado a `main` en M0, antes de branchear)
 
 Cada quien consume **una** función del otro; ambas nacen como mock para no bloquearse:
 
 ```ts
 // packages/shared/src/types.ts
-export interface SafetyCheckRequest { drugs: string[] }
+export interface SafetyCheckRequest { patientId?: string; drugs: string[] }
 export interface RecallHit { recallId: string; classification: 'I'|'II'|'III'; reason: string; status: string; sourceUrl: string }
-export interface InteractionHit { pair: [string, string]; severity: string; description: string; sourceUrl: string }
 export interface SafetyReport {
-  drugs: { input: string; rxcui: string | null; activeRecalls: RecallHit[] }[]
-  interactions: InteractionHit[]
-  sources: string[]            // URLs de provenance
+  drugs: { input: string; activeRecalls: RecallHit[] }[]
+  bulletin: string             // texto en español generado por Claude vía TrueFoundry
+  sources: string[]            // URLs de provenance (openFDA)
   generatedAt: string
   disclaimer: string
 }
-export interface Bulletin { slug: string; title: string; body: string; tags: string[]; provenance: { url: string; publishedAt: string }[] }
+export interface Alert { title: string; body: string; channel: 'slack'|'gmail'; provenance: { url: string }[] }
 
-// Contrato A → B (A la implementa en packages/rxnorm+sources; B la consume en apps/api)
+// Contrato A → B (A la implementa en packages/sources; B la consume en apps/api)
 export type CheckDrugSafety = (req: SafetyCheckRequest) => Promise<SafetyReport>
 
-// Contrato B → A (B la implementa en packages/publisher; A la consume en apps/worker)
-export type PublishBulletin = (b: Bulletin) => Promise<{ url: string }>
+// Contrato B → A (B la implementa en packages/notifier vía Composio; A la consume en apps/worker)
+export type PostAlert = (a: Alert) => Promise<{ ok: boolean; ref: string }>
 ```
 
 ```sql
@@ -51,60 +55,57 @@ export type PublishBulletin = (b: Bulletin) => Promise<{ url: string }>
 CREATE TABLE events (
   ts DateTime, kind LowCardinality(String), payload String
 ) ENGINE = MergeTree ORDER BY (kind, ts);
--- kinds: recall_detected | patient_matched | alert_sent | bulletin_published | paid_request
-
-CREATE TABLE paid_requests (
-  ts DateTime, route String, price_usdc Decimal(10,6),
-  payer_wallet String, tx_hash String, latency_ms UInt32
-) ENGINE = MergeTree ORDER BY ts;
+-- kinds: recall_detected | patient_matched | bulletin_generated | alert_sent
 ```
 
-`.env.example` completo desde M0 (aunque los valores lleguen después): `CLICKHOUSE_URL`, `CDP_API_KEY_ID/SECRET`, `WALLET_ADDRESS`, `SENSO_API_KEY`, `COMPOSIO_API_KEY`, `TWILIO_*`, `AWS_*`, `OPENFDA_BASE`, y `LLM_PROVIDER` + `LLM_BASE_URL` + `LLM_API_KEY`.
+`.env.example` desde M0 (valores reales después):
+`CLICKHOUSE_URL`, `COMPOSIO_API_KEY`, `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`, `OPENFDA_BASE`.
 
-**Regla de diseño del cliente LLM:** A escribe UNA función `llmComplete(model, prompt)` OpenAI-compatible, parametrizada por `LLM_BASE_URL`/`LLM_API_KEY`. El default es `LLM_PROVIDER=truefoundry`: TODA la inferencia (Claude para boletines, Pioneer para clasificar) pasa por el AI Gateway con una virtual key que emite B — el código nunca toca keys de proveedores. Cambiar de modelo = cambiar el string `model`. Fallback de emergencia si el gateway falla en vivo: apuntar `LLM_BASE_URL` a un proveedor directo (mismo código).
+**Regla del cliente LLM:** A escribe UNA función `llmComplete(model, prompt)` OpenAI-compatible, parametrizada por `LLM_BASE_URL`/`LLM_API_KEY`. El default apunta al **AI Gateway de TrueFoundry** con una virtual key que emite B: toda la inferencia pasa por ahí, el código nunca toca keys de proveedores. Cambiar de modelo = cambiar el string `model`. Fallback si el gateway falla en vivo: apuntar `LLM_BASE_URL` a un proveedor directo (mismo código).
 
-## Cadencia de merges — 5 puntos, no un big-bang al final
+## Cadencia de merges — 3 puntos en 2 horas
 
-| Punto | Hora | Qué se mergea | Criterio de aceptación (si no pasa, no se mergea) |
+| Punto | Hora | Qué se mergea | Criterio de aceptación |
 |---|---|---|---|
-| **M0** | h0 | Scaffold + contrato (juntos, en `main`) | `npm run build` verde; tipos y DDL commiteados; ambos branchean |
-| **M1** | ~h6 | Primeros avances de ambos | Build verde con las DOS ramas en main; B muestra 402→pago testnet contra endpoint **stub** y entrega la virtual key de TrueFoundry probada con un completion; A muestra `getRxcui()` + cliente openFDA con test |
-| **M2** | ~h14 | Worker v1 (A) + publisher real (B) | El worker detecta un recall sembrado y publica **de verdad** en cited.md vía `publishBulletin` de B; servicio de B listado en agentic.market |
-| **M3** | ~h22 | La integración grande | B reemplaza su mock por el `checkDrugSafety` real de A → un buyer paga $0.01 y recibe el reporte real; el WhatsApp dispara. **End-to-end completo** |
-| **M4** | h30 | Freeze | Solo `main` de aquí en adelante: seeds, guion, video de respaldo, README. Stretch (Pioneer/OpenUI/Guild) solo si M3 quedó sólido |
+| **M0** | h0 (~10 min, juntos) | Scaffold + contrato en `main` | `npm run build` verde; tipos y DDL commiteados; ambos branchean. *(Ya existe el commit de scaffold — solo se actualiza el contrato a esta versión.)* |
+| **M1** | ~h1 | Avances de ambos con mocks | A: `checkDrugSafety` devuelve datos **reales** de openFDA. B: endpoint `/check` responde, **escribe en ClickHouse** y `postAlert` **publica de verdad** en Slack con un reporte mock. TrueFoundry virtual key probada con un completion. |
+| **M2** | ~h1:45 | La integración grande | B reemplaza su mock por el `checkDrugSafety` real de A. **End-to-end:** recall sembrado → match de paciente → boletín de Claude (TrueFoundry) → alerta a Slack/Gmail (Composio) → eventos en ClickHouse → visibles en el dashboard de Render. |
+| **Freeze** | últimos ~15 min | Solo `main` | Seeds deterministas, guion de demo, README, deploy final en Render. |
 
-## Reparto hora por hora
+## Reparto media hora por media hora
 
 **Persona A — `feat/agente-clinico`**
 
-| Horas | Tarea |
+| Tiempo | Tarea |
 |---|---|
-| 0–1 | (juntos) M0 + probar destino ClickHouse de Airbyte |
-| 1–5 | `packages/rxnorm` (getRxcui, checkInteractions) + `packages/sources` (cliente openFDA) |
-| 5–10 | `apps/worker`: poll openFDA → RxCUI → cruce vs medications sintéticas → evento a ClickHouse |
-| 10–14 | Boletín (Claude) y clasificador de severidad (Pioneer), ambos vía `llmComplete()` → gateway TrueFoundry + WhatsApp Twilio + llamar `publishBulletin` (mock→real en M2) |
-| 14–18 | Composio (Slack/Gmail) + Airbyte: Postgres→ClickHouse |
-| 18–22 | Implementación final de `checkDrugSafety` para B + fixture de recall sembrado (demo determinista) |
-| 22–30 | Conector openFDA en Airbyte Builder (stretch) · feedback útil/no-útil del médico → señal de entrenamiento a Pioneer (stretch) · seeds y pulido |
+| 0:00–0:10 | (juntos) M0: actualizar `types.ts`, `schema.sql`, `.env.example`; `npm run build` verde; branchear |
+| 0:10–0:45 | `packages/sources`: cliente openFDA (endpoint *drug enforcement*) + match de fármacos contra padrón sintético → `RecallHit[]` |
+| 0:45–1:20 | `apps/worker` + `llmComplete()`: cruzar recall vs pacientes sintéticos → boletín con Claude (gateway TrueFoundry) → llamar `postAlert` (mock→real) + helper para loggear eventos a ClickHouse |
+| 1:20–1:45 | Implementación final de `checkDrugSafety` para B + **fixture de recall sembrado** (demo determinista) |
+| 1:45–2:00 | (juntos) seeds, ensayo del demo end-to-end |
 
-**Persona B — `feat/rieles-dinero`**
+**Persona B — `feat/rieles`**
 
-| Horas | Tarea |
+| Tiempo | Tarea |
 |---|---|
-| 0–1 | (juntos) M0 + wallet `npx awal` + faucet USDC Base Sepolia |
-| 1–4 | `apps/api`: `@x402/express` sobre endpoint stub que devuelve un `SafetyReport` falso · sandbox TrueFoundry: registrar providers (Claude + Pioneer con sus créditos) y emitir la virtual key para A (entregar en M1) |
-| 4–6 | CDP Facilitator + `declareDiscoveryExtension` + self-call pagado → listado en agentic.market |
-| 6–10 | `packages/publisher`: handle en cited.md (CLI Senso) + publicar 2 boletines a mano |
-| 10–14 | `demo/buyer`: script comprador `@x402/axios` + verificación en Basescan |
-| 14–18 | Dashboard de revenue sobre ClickHouse (`paid_requests`, `events`) + tesorería vía Composio: el agente lee su wallet CDP (toolkit Coinbase, `COINBASE_LIST_WALLETS`) y postea "hoy gané $X USDC" al Slack — probar las API keys de CDP en Composio temprano |
-| 18–22 | `render.yaml` (web service + cron) y deploy; en M3 conectar el `checkDrugSafety` real |
-| 22–30 | OpenUI para el reporte (stretch) · MCP Gateway de TrueFoundry: registrar el MCP de Composio para que los tool calls también queden gobernados con RBAC y auditoría (stretch) · Guild (stretch) |
+| 0:00–0:10 | (juntos) M0 + crear instancia **ClickHouse Cloud** (free) y obtener `CLICKHOUSE_URL` + cuenta **Render** |
+| 0:10–0:45 | `apps/api`: endpoint Express `/check` que llama `checkDrugSafety` (mock primero) + cliente ClickHouse + escritura de `events` + correr `schema.sql`. Emitir la **virtual key de TrueFoundry** y entregarla a A. |
+| 0:45–1:20 | `packages/notifier`: `postAlert` vía **Composio** a Slack (+ Gmail si da tiempo); probar publicando una alerta de ejemplo |
+| 1:20–1:45 | Mini-dashboard que lee `events` de ClickHouse + **deploy en Render** (`render.yaml`, web service) |
+| 1:45–2:00 | (juntos) conectar el `checkDrugSafety` real, test end-to-end, deploy final |
 
 ## Reglas de git (para no pelearse en el merge)
 
-1. Las dos ramas salen de `main` en M0 y **viven hasta el final** — pero mergean a `main` en CADA punto M, no solo al final. Merges pequeños = conflictos pequeños.
+1. Las dos ramas salen de `main` en M0 y mergean a `main` en M1 y M2 (no big-bang al final).
 2. Después de cada M, ambos hacen `git merge main` en su rama (o rebase, pero elijan UNO los dos).
-3. PR cruzado en cada M: el otro revisa máximo 10 minutos. No es code review de producción, es "¿rompes algo mío?".
+3. PR cruzado en cada M: revisión de máximo 5 min — "¿rompes algo mío?".
 4. Conflicto esperado único: lockfile raíz → lo regenera quien mergea segundo (`rm package-lock.json && npm install`).
-5. Si necesitas algo de la carpeta del otro: NO lo edites — pídelo o agrégalo a `packages/shared` juntos.
-6. Mensajes de commit con prefijo de área (`worker:`, `api:`, `publisher:`...) para que el log cuente la historia en el repo público que ven los jueces.
+5. Si necesitas algo de la carpeta del otro: NO lo edites — pídelo o agréguenlo a `packages/shared` juntos.
+6. Commits con prefijo de área (`worker:`, `api:`, `notifier:`, `sources:`) para que el log cuente la historia en el repo público que ven los jueces.
+
+## Plan B si algo falla en vivo (sin esto no hay demo)
+
+- **Recall sembrado** en `demo/seed-data/`: el worker corre contra un fixture fijo, no depende de que openFDA responda en el momento.
+- **`postAlert` con flag `DRY_RUN`**: si Composio/Slack cae, imprime la alerta en consola y sigue.
+- **`llmComplete` con fallback**: si el gateway de TrueFoundry falla, `LLM_BASE_URL` apunta a proveedor directo (mismo código).
+- El dashboard lee de ClickHouse, pero guarda un **JSON de respaldo** con los últimos eventos por si la DB no responde.
