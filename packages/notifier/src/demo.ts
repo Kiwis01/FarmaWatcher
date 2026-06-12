@@ -15,7 +15,7 @@ const alert: Alert = {
   body:
     'Un paciente de tu padrón toma Losartán, sujeto a retiro Clase I por contaminación con nitrosaminas. ' +
     'Suspender y contactar al prescriptor.',
-  channel: 'gmail',
+  channel: (process.argv[2] as 'slack' | 'gmail') || 'slack',
   provenance: [
     { url: 'https://api.fda.gov/drug/enforcement.json?search=losartan' },
   ],

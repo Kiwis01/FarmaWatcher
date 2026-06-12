@@ -77,7 +77,7 @@ app.post('/check', async (req, res) => {
       const alert: Alert = {
         title: `⚠️ Retiro FDA Clase ${top.classification} — ${hits[0].input}`,
         body: report.bulletin,
-        channel: 'gmail',
+        channel: 'slack',
         provenance: report.sources.map((url) => ({ url })),
       };
       alertResult = await postAlert(alert);
