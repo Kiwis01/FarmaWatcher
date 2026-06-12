@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "build": "tsc --noEmit",
+    "start": "npm run start -w @farmavigia/dashboard",
     "typecheck": "tsc --noEmit",
     "worker": "npm run start -w @farmavigia/worker",
     "dashboard": "npm run start -w @farmavigia/dashboard",
