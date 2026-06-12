@@ -1,25 +1,69 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchEvents,
+  fetchRecallDetail,
   toDate,
   hms,
   parse,
   KIND,
+  CLASS_META,
+  classOf,
+  statusLabel,
+  statusTitle,
+  voluntaryLabel,
+  notificationLabel,
+  firmPlace,
+  fmtFdaDate,
+  quantityLabel,
+  distributionLabel,
+  reasonGist,
+  parseCodeInfo,
+  channelLabel,
+  wordsOf,
+  clean,
   type EventsResult,
   type EventPayload,
   type EventRow,
+  type DetailState,
+  type RecallDetail,
 } from "./lib";
 
 const KIND_KEYS = ["recall_detected", "patient_matched", "bulletin_generated", "alert_sent"];
 
-function ClassTag({ c }: { c?: string }) {
-  if (!c) return null;
-  return <span className={`cls cls-${c}`}>Clase {c}</span>;
+// Un retiro único visto por el agente, agregado desde la bitácora de eventos.
+interface RecallCard {
+  id: string;
+  drug: string;
+  cls: "I" | "II" | "III";
+  status?: string;
+  sourceUrl?: string;
+  reason?: string;
+  seenAt: Date;
+  patientIds: string[];
 }
 
-function Summary({ kind, d }: { kind: string; d: EventPayload }) {
+function ClassTag({ c }: { c?: string }) {
+  if (!c) return null;
+  const cls = classOf(c);
+  return (
+    <span className={`cls cls-${cls}`} title={CLASS_META[cls].def}>
+      Class {cls}
+    </span>
+  );
+}
+
+function Summary({
+  kind,
+  d,
+  names,
+}: {
+  kind: string;
+  d: EventPayload;
+  names: Map<string, string>;
+}) {
   switch (kind) {
-    case "recall_detected":
+    case "recall_detected": {
+      const st = statusLabel(d.status);
       return (
         <>
           <strong>{d.drug}</strong>
@@ -34,31 +78,41 @@ function Summary({ kind, d }: { kind: string; d: EventPayload }) {
             <span className="data">{d.recallId}</span>
           )}
           <ClassTag c={d.classification} />
+          {st && <span className="faint">{st.toLowerCase()}</span>}
         </>
       );
+    }
     case "patient_matched":
       return (
         <>
           <strong>{d.name || d.patientId}</strong>
           {d.patientId && <span className="data">{d.patientId}</span>}
-          {Array.isArray(d.drugs) && d.drugs.length > 0 && <span>{d.drugs.join(", ")}</span>}
+          {Array.isArray(d.drugs) && d.drugs.length > 0 && (
+            <span>takes {d.drugs.join(" and ")}</span>
+          )}
         </>
       );
-    case "bulletin_generated":
+    case "bulletin_generated": {
+      const w = wordsOf(d.bulletin, d.chars);
       return (
         <>
-          <span>Paciente</span>
-          <span className="data">{d.patientId}</span>
-          <span className="faint">{d.chars ?? 0} caracteres</span>
+          <span>Plain-language bulletin for</span>
+          <strong>{(d.patientId && names.get(d.patientId)) || `patient ${d.patientId ?? "—"}`}</strong>
+          {w > 0 && <span className="faint">≈{w} words</span>}
         </>
       );
+    }
     case "alert_sent":
       return (
         <>
-          <span className="data">{d.patientId}</span>
-          <span>{d.channel}</span>
-          {d.ok ? <span className="ok">✓ enviada</span> : <span className="fail">✗ falló</span>}
-          <span className="data">{d.ref}</span>
+          <strong>{(d.patientId && names.get(d.patientId)) || d.patientId}</strong>
+          <span>alerted via {channelLabel(d.channel)}</span>
+          {d.ok ? <span className="ok">✓ delivered</span> : <span className="fail">✗ failed</span>}
+          {d.ref === "dry-run" ? (
+            <span className="faint">dry run</span>
+          ) : (
+            d.ref && <span className="data">{d.ref}</span>
+          )}
         </>
       );
     default:
@@ -72,6 +126,9 @@ export default function App() {
   const [offline, setOffline] = useState(false);
   const [activeKinds, setActiveKinds] = useState<Set<string>>(new Set(KIND_KEYS));
   const [patientFilter, setPatientFilter] = useState<string | null>(null);
+  const [details, setDetails] = useState<Record<string, DetailState>>({});
+  const [openRecall, setOpenRecall] = useState<string | null>(null);
+  const autoOpened = useRef(false);
 
   // Revelado escalonado solo en la primera carga; las filas nuevas entran sin retraso.
   const firstBatch = useRef(true);
@@ -119,16 +176,71 @@ export default function App() {
       .sort((a, b) => toDate(b.ts).getTime() - toDate(a.ts).getTime());
   }, [data]);
 
-  // Entidades únicas (para que las cifras no se inflen en modo continuo).
-  const recallsById = useMemo(() => {
-    const m = new Map<string, string>(); // recallId -> classification
+  // patientId -> nombre (para hablar de personas, no de claves).
+  const names = useMemo(() => {
+    const m = new Map<string, string>();
     for (const e of events) {
-      if (e.kind !== "recall_detected") continue;
+      if (e.kind !== "patient_matched") continue;
       const d = parse(e.payload);
-      if (d.recallId) m.set(d.recallId, d.classification ?? "II");
+      if (d.patientId && d.name) m.set(d.patientId, d.name);
     }
     return m;
   }, [events]);
+
+  // Retiros únicos, del más severo al más reciente. El dossier del demo.
+  const recallCards = useMemo(() => {
+    const m = new Map<string, RecallCard>();
+    // Recorremos del más viejo al más nuevo para que seenAt sea el primer avistamiento.
+    for (let i = events.length - 1; i >= 0; i--) {
+      const e = events[i];
+      if (e.kind !== "recall_detected") continue;
+      const d = parse(e.payload);
+      if (!d.recallId) continue;
+      const cur = m.get(d.recallId);
+      if (cur) {
+        if (d.patientId && !cur.patientIds.includes(d.patientId)) cur.patientIds.push(d.patientId);
+        if (!cur.reason && d.reason) cur.reason = d.reason;
+      } else {
+        m.set(d.recallId, {
+          id: d.recallId,
+          drug: d.drug ?? "—",
+          cls: classOf(d.classification),
+          status: d.status,
+          sourceUrl: d.sourceUrl,
+          reason: d.reason,
+          seenAt: toDate(e.ts),
+          patientIds: d.patientId ? [d.patientId] : [],
+        });
+      }
+    }
+    return [...m.values()].sort(
+      (a, b) => rank(a.cls) - rank(b.cls) || b.seenAt.getTime() - a.seenAt.getTime(),
+    );
+  }, [events]);
+
+  // Pide el dossier completo (fixture u openFDA) una sola vez por recall.
+  useEffect(() => {
+    for (const c of recallCards) {
+      if (details[c.id]) continue;
+      setDetails((prev) => (prev[c.id] ? prev : { ...prev, [c.id]: { status: "loading" } }));
+      fetchRecallDetail(c.id).then((res) => {
+        setDetails((prev) => ({
+          ...prev,
+          [c.id]: res
+            ? { status: "ready", source: res.source, record: res.record }
+            : { status: "none" },
+        }));
+      });
+    }
+  }, [recallCards, details]);
+
+  // El retiro más severo llega abierto: el dossier se muestra solo.
+  useEffect(() => {
+    if (!autoOpened.current && recallCards.length) {
+      setOpenRecall(recallCards[0].id);
+      autoOpened.current = true;
+    }
+  }, [recallCards]);
 
   const patients = useMemo(() => {
     const m = new Map<string, { name: string; drugs: string[]; worst: string }>();
@@ -159,15 +271,25 @@ export default function App() {
 
   const classCounts = useMemo(() => {
     const c: Record<string, number> = { I: 0, II: 0, III: 0 };
-    for (const cls of recallsById.values()) c[cls] = (c[cls] ?? 0) + 1;
+    for (const card of recallCards) c[card.cls] = (c[card.cls] ?? 0) + 1;
     return c;
-  }, [recallsById]);
+  }, [recallCards]);
+
+  const kindCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const e of events) m[e.kind] = (m[e.kind] ?? 0) + 1;
+    return m;
+  }, [events]);
 
   const feed = events.filter((e) => {
     if (!activeKinds.has(e.kind)) return false;
     if (patientFilter) return parse(e.payload).patientId === patientFilter;
     return true;
   });
+
+  const visibleCards = patientFilter
+    ? recallCards.filter((c) => c.patientIds.includes(patientFilter))
+    : recallCards;
 
   // Un boletín por paciente (el más reciente): el modo continuo regenera el mismo
   // boletín en cada pasada y la columna se llenaba de duplicados.
@@ -186,13 +308,29 @@ export default function App() {
       .filter((d) => !patientFilter || d.patientId === patientFilter);
   }, [events, patientFilter]);
 
+  const bulletinPatients = useMemo(
+    () =>
+      new Set(
+        events
+          .filter((e) => e.kind === "bulletin_generated")
+          .map((e) => parse(e.payload).patientId)
+          .filter(Boolean),
+      ).size,
+    [events],
+  );
+
   const source = offline ? "offline" : (data?.source ?? "backup");
 
+  // La banda cuenta la historia del pipeline en orden: detectar -> cruzar -> explicar -> avisar.
   const stats = [
-    { label: "Eventos", value: events.length },
-    { label: "Recalls únicos", value: recallsById.size },
-    { label: "Pacientes afectados", value: patients.length },
-    { label: "Alertas · sesión", value: events.filter((e) => e.kind === "alert_sent").length },
+    { label: "Active recalls", sub: "found in registry drugs", value: recallCards.length },
+    { label: "Patients affected", sub: "taking a recalled drug", value: patients.length },
+    { label: "Bulletins", sub: "plain-language summary · Claude", value: bulletinPatients },
+    {
+      label: "Alerts · session",
+      sub: "notices sent via Slack",
+      value: events.filter((e) => e.kind === "alert_sent").length,
+    },
   ];
 
   const toggleKind = (k: string) => {
@@ -204,31 +342,44 @@ export default function App() {
     });
   };
 
+  const togglePatient = (id: string) =>
+    setPatientFilter((prev) => (prev === id ? null : id));
+
   return (
     <div className="wrap">
-      <header className="top">
-        <div className="brand">
-          <span className="mark" aria-hidden="true" />
-          <div>
-            <h1>FarmacoVigía</h1>
-            <p>Centro de eventos · Farmacovigilancia</p>
+      <header className="masthead">
+        <div className="top">
+          <div className="brand">
+            <span className="mark" aria-hidden="true" />
+            <div>
+              <h1>FarmacoVigía</h1>
+              <p>Event center · Pharmacovigilance</p>
+            </div>
+          </div>
+          <div className="status">
+            <SourceBadge source={source} />
+            <span className="live">
+              <span className="dot" aria-hidden="true" />
+              Live
+            </span>
+            <span className="clock">Updated {updated}</span>
           </div>
         </div>
-        <div className="status">
-          <SourceBadge source={source} />
-          <span className="live">
-            <span className="dot" aria-hidden="true" />
-            En vivo
-          </span>
-          <span className="clock">Actualizado {updated}</span>
-        </div>
+        <p className="strap">
+          Watches the drug recalls published by the FDA, cross-checks them against the
+          patient registry, and alerts — in plain language — anyone taking an affected drug.
+        </p>
       </header>
 
-      <section className="band" aria-label="Cifras">
-        {stats.map((s) => (
+      <section className="band" aria-label="Pipeline overview">
+        {stats.map((s, i) => (
           <div key={s.label} className="cell">
             <div className="num">{s.value}</div>
-            <div className="cap">{s.label}</div>
+            <div className="cap">
+              <span className="step">{String(i + 1).padStart(2, "0")}</span>
+              {s.label}
+            </div>
+            <div className="sub">{s.sub}</div>
           </div>
         ))}
       </section>
@@ -236,10 +387,10 @@ export default function App() {
       {patientFilter && (
         <div className="filterbar">
           <span>
-            Filtrando paciente <strong>{patientFilter}</strong>
+            Showing only <strong>{names.get(patientFilter) ?? patientFilter}</strong>
           </span>
           <button className="clear" onClick={() => setPatientFilter(null)}>
-            ✕ Quitar filtro
+            ✕ Clear filter
           </button>
         </div>
       )}
@@ -247,24 +398,51 @@ export default function App() {
       <div className="grid">
         <section className="col-feed">
           <div className="sec-head">
-            <h2>Flujo de eventos</h2>
-            <div className="chips" role="group" aria-label="Filtrar por tipo">
+            <h2>Active recalls · openFDA</h2>
+          </div>
+          {visibleCards.length === 0 ? (
+            <p className="empty">
+              {patientFilter
+                ? "This patient has no recalls on file."
+                : "No active recalls right now — the agent keeps watching openFDA."}
+            </p>
+          ) : (
+            <div className="dossiers">
+              {visibleCards.map((c) => (
+                <RecallDossier
+                  key={c.id}
+                  card={c}
+                  state={details[c.id]}
+                  open={openRecall === c.id}
+                  onToggle={() => setOpenRecall(openRecall === c.id ? null : c.id)}
+                  names={names}
+                  onPatient={togglePatient}
+                />
+              ))}
+            </div>
+          )}
+
+          <div className="sec-head feed-head">
+            <h2>Live log</h2>
+            <div className="chips" role="group" aria-label="Filter by type">
               {KIND_KEYS.map((k) => (
                 <button
                   key={k}
                   className={`chip ${activeKinds.has(k) ? "on" : ""}`}
                   aria-pressed={activeKinds.has(k)}
+                  title={KIND[k]?.label}
                   onClick={() => toggleKind(k)}
                 >
                   {KIND[k]?.code}
+                  <span className="n">{kindCounts[k] ?? 0}</span>
                 </button>
               ))}
             </div>
           </div>
           {feed.length === 0 ? (
             <p className="empty">
-              Sin eventos con este filtro. Activa más tipos arriba o quita el filtro de
-              paciente.
+              No events match this filter. Turn more types back on above, or clear the
+              patient filter.
             </p>
           ) : (
             <ol className="feed">
@@ -290,7 +468,7 @@ export default function App() {
                       {meta.code}
                     </span>
                     <div className="body">
-                      <Summary kind={e.kind} d={d} />
+                      <Summary kind={e.kind} d={d} names={names} />
                     </div>
                   </li>
                 );
@@ -301,14 +479,14 @@ export default function App() {
 
         <aside className="rail">
           <section>
-            <h2>Recalls por clase</h2>
-            <ClassChart counts={classCounts} />
+            <h2>Severity · what it means</h2>
+            <SeverityLegend counts={classCounts} />
           </section>
 
           <section>
-            <h2>Pacientes afectados</h2>
+            <h2>Patients affected</h2>
             {patients.length === 0 ? (
-              <p className="empty">Ninguno todavía — el agente está vigilando.</p>
+              <p className="empty">None yet — the agent is watching.</p>
             ) : (
               <ul className="patients">
                 {patients.map((p) => (
@@ -316,13 +494,11 @@ export default function App() {
                     <button
                       className={`pt ${patientFilter === p.id ? "sel" : ""}`}
                       aria-pressed={patientFilter === p.id}
-                      onClick={() =>
-                        setPatientFilter(patientFilter === p.id ? null : p.id)
-                      }
+                      onClick={() => togglePatient(p.id)}
                     >
                       <span
                         className={`rn rn-${p.worst}`}
-                        title={`Peor clase: ${p.worst}`}
+                        title={`Worst class: ${p.worst} — ${CLASS_META[classOf(p.worst)].risk}`}
                       >
                         {p.worst}
                       </span>
@@ -336,17 +512,18 @@ export default function App() {
           </section>
 
           <section>
-            <h2>Boletines · Claude</h2>
+            <h2>Patient bulletins · Claude</h2>
             {bulletins.length === 0 ? (
               <p className="empty">
-                Aún no hay boletines. Se generan cuando un recall coincide con un
-                paciente.
+                No bulletins yet. They are generated when a recall matches a patient.
               </p>
             ) : (
               <div className="bulletins">
                 {bulletins.map((d) => (
                   <article key={d.patientId} className="bull">
-                    <div className="who">Paciente {d.patientId}</div>
+                    <div className="who">
+                      For {(d.patientId && names.get(d.patientId)) || `patient ${d.patientId}`}
+                    </div>
                     <p className="txt">
                       {(d.bulletin ?? "").replace(/^[\s\p{Extended_Pictographic}️]+/u, "")}
                     </p>
@@ -360,7 +537,7 @@ export default function App() {
 
       <footer className="creds">
         <span>
-          Datos <b>ClickHouse</b>
+          Data <b>ClickHouse</b>
         </span>
         <span>
           Deploy <b>Render</b>
@@ -369,10 +546,10 @@ export default function App() {
           LLM <b>TrueFoundry</b>
         </span>
         <span>
-          Alertas <b>Composio</b>
+          Alerts <b>Composio</b>
         </span>
         <span>
-          Fuente <b>openFDA</b>
+          Source <b>openFDA</b>
         </span>
       </footer>
     </div>
@@ -383,26 +560,243 @@ function rank(c: string): number {
   return c === "I" ? 0 : c === "II" ? 1 : 2;
 }
 
-function ClassChart({ counts }: { counts: Record<string, number> }) {
-  const max = Math.max(1, counts.I ?? 0, counts.II ?? 0, counts.III ?? 0);
-  const rows: { c: string; label: string }[] = [
-    { c: "I", label: "Clase I" },
-    { c: "II", label: "Clase II" },
-    { c: "III", label: "Clase III" },
-  ];
+/**
+ * El dossier de un retiro: cabecera siempre legible (fármaco, clase en palabras,
+ * estado) y al expandir, todo el jugo de openFDA en lenguaje llano.
+ */
+function RecallDossier({
+  card,
+  state,
+  open,
+  onToggle,
+  names,
+  onPatient,
+}: {
+  card: RecallCard;
+  state?: DetailState;
+  open: boolean;
+  onToggle: () => void;
+  names: Map<string, string>;
+  onPatient: (id: string) => void;
+}) {
+  const [allLots, setAllLots] = useState(false);
+  const rec: RecallDetail | undefined = state?.status === "ready" ? state.record : undefined;
+  const meta = CLASS_META[card.cls];
+
+  const status = statusLabel(rec?.status ?? card.status);
+  const reason = clean(rec?.reason_for_recall ?? card.reason);
+  const gist = reasonGist(reason ?? undefined);
+  const firm = clean(rec?.recalling_firm);
+  const place = rec ? firmPlace(rec) : null;
+  const kind = [voluntaryLabel(rec?.voluntary_mandated), notificationLabel(rec?.initial_firm_notification)]
+    .filter(Boolean)
+    .join("; ");
+  const scope = [distributionLabel(rec?.distribution_pattern), quantityLabel(rec?.product_quantity)]
+    .filter(Boolean)
+    .join(" · ");
+  const codes = parseCodeInfo(rec?.code_info);
+  const lots = allLots ? codes.lots : codes.lots.slice(0, 10);
+  const milestones = [
+    { cap: "Firm began the recall", val: fmtFdaDate(rec?.recall_initiation_date) },
+    { cap: "FDA classified it", val: fmtFdaDate(rec?.center_classification_date) },
+    { cap: "Published in the report", val: fmtFdaDate(rec?.report_date) },
+  ].filter((s) => s.val);
+  const product = clean(rec?.product_description);
+
+  const srcNote = [
+    state?.status === "ready"
+      ? state.source === "openfda"
+        ? "record fetched live from openFDA"
+        : "local fallback record"
+      : null,
+    `first seen at ${hms(card.seenAt)}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
-    <div className="chart">
-      {rows.map((r) => {
-        const v = counts[r.c] ?? 0;
+    <article className={`rc${open ? " open" : ""}`}>
+      <button className="rc-head" aria-expanded={open} onClick={onToggle}>
+        <span className={`rn rn-${card.cls}`} aria-hidden="true">
+          {card.cls}
+        </span>
+        <span className="rc-title">
+          <span className="rc-drug">{card.drug}</span>
+          <span className="rc-meta">
+            {card.id}
+            {firm ? ` · ${firm}` : ""}
+          </span>
+        </span>
+        <span className="rc-tags">
+          <span className={`cls cls-${card.cls}`} title={meta.def}>
+            Class {card.cls}
+          </span>
+          <span className="rc-risk">{meta.risk}</span>
+          {status && (
+            <span className="rc-status" title={statusTitle(rec?.status ?? card.status)}>
+              {status}
+            </span>
+          )}
+        </span>
+        <span className="chev" aria-hidden="true" />
+      </button>
+
+      <div className="rc-body">
+        <div className="rc-inner">
+          <div className="rc-pad">
+            {gist && <p className="rc-gist">{gist}</p>}
+
+            <dl className="rc-grid">
+              {reason && (
+                <>
+                  <dt>FDA reason</dt>
+                  <dd className="rc-en">{reason}</dd>
+                </>
+              )}
+              {(firm || place) && (
+                <>
+                  <dt>Recalled by</dt>
+                  <dd>{[firm, place].filter(Boolean).join(" · ")}</dd>
+                </>
+              )}
+              {kind && (
+                <>
+                  <dt>Type</dt>
+                  <dd>{kind}</dd>
+                </>
+              )}
+              {scope && (
+                <>
+                  <dt>Scope</dt>
+                  <dd title={clean(rec?.distribution_pattern) ?? undefined}>{scope}</dd>
+                </>
+              )}
+              {milestones.length > 0 && (
+                <>
+                  <dt>Timeline</dt>
+                  <dd>
+                    <ol className="tl">
+                      {milestones.map((s) => (
+                        <li key={s.cap}>
+                          <span className="tl-date">{s.val}</span>
+                          <span className="tl-cap">{s.cap}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </dd>
+                </>
+              )}
+              {codes.lots.length > 0 && (
+                <>
+                  <dt>Lots</dt>
+                  <dd>
+                    <span className="rc-hint">
+                      Compare with the “Lot” printed on your package:
+                    </span>
+                    <span className="lots">
+                      {lots.map((l) => (
+                        <code key={l} className="lot">
+                          {l}
+                        </code>
+                      ))}
+                      {codes.lots.length > 10 && (
+                        <button
+                          className="lot more"
+                          aria-expanded={allLots}
+                          onClick={() => setAllLots(!allLots)}
+                        >
+                          {allLots ? "show less" : `+${codes.lots.length - 10} more`}
+                        </button>
+                      )}
+                    </span>
+                  </dd>
+                </>
+              )}
+              {codes.ndcs.length > 0 && (
+                <>
+                  <dt>NDC</dt>
+                  <dd>
+                    <span className="lots">
+                      {codes.ndcs.map((n) => (
+                        <code key={n} className="lot">
+                          {n}
+                        </code>
+                      ))}
+                    </span>
+                  </dd>
+                </>
+              )}
+              {product && (
+                <>
+                  <dt>Product</dt>
+                  <dd className="rc-en rc-product" title={product}>
+                    {product}
+                  </dd>
+                </>
+              )}
+              {card.patientIds.length > 0 && (
+                <>
+                  <dt>In the registry</dt>
+                  <dd>
+                    <span className="lots">
+                      {card.patientIds.map((id) => (
+                        <button key={id} className="lot pat" onClick={() => onPatient(id)}>
+                          {names.get(id) ?? id}
+                        </button>
+                      ))}
+                    </span>
+                  </dd>
+                </>
+              )}
+            </dl>
+
+            {state?.status === "loading" && (
+              <p className="rc-note loading">Querying openFDA…</p>
+            )}
+            {state?.status === "none" && (
+              <p className="rc-note">Full record unavailable (openFDA unreachable).</p>
+            )}
+
+            <div className="rc-foot">
+              {card.sourceUrl && (
+                <a className="lnk" href={card.sourceUrl} target="_blank" rel="noreferrer">
+                  View record on openFDA
+                  <span className="ext" aria-hidden="true">
+                    ↗
+                  </span>
+                </a>
+              )}
+              <span className="rc-src">{srcNote}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/** Las tres clases FDA con su definición en palabras: la leyenda que faltaba. */
+function SeverityLegend({ counts }: { counts: Record<string, number> }) {
+  const max = Math.max(1, counts.I ?? 0, counts.II ?? 0, counts.III ?? 0);
+  return (
+    <div className="legend">
+      {(["I", "II", "III"] as const).map((c) => {
+        const v = counts[c] ?? 0;
+        const meta = CLASS_META[c];
         return (
-          <div key={r.c} className="crow" title={r.label}>
-            <span className={`rn rn-${r.c}`}>{r.c}</span>
+          <div key={c} className={`lrow${v === 0 ? " mute" : ""}`}>
+            <div className="lhead">
+              <span className={`rn rn-${c}`}>{c}</span>
+              <span className="lname">{meta.name}</span>
+              <span className="lrisk">{meta.risk}</span>
+              <span className="cval">{v}</span>
+            </div>
             <div className="track">
               {v > 0 && (
-                <div className={`fill f-${r.c}`} style={{ width: `${(v / max) * 100}%` }} />
+                <div className={`fill f-${c}`} style={{ width: `${(v / max) * 100}%` }} />
               )}
             </div>
-            <span className="cval">{v}</span>
+            <p className="ldef">{meta.def}</p>
           </div>
         );
       })}
@@ -412,7 +806,7 @@ function ClassChart({ counts }: { counts: Record<string, number> }) {
 
 function SourceBadge({ source }: { source: string }) {
   if (source === "clickhouse") return <span className="tag ok">ClickHouse</span>;
-  if (source === "local") return <span className="tag ok">Fuente · Worker</span>;
-  if (source === "offline") return <span className="tag warn">Sin conexión</span>;
-  return <span className="tag warn">Respaldo</span>;
+  if (source === "local") return <span className="tag ok">Source · Worker</span>;
+  if (source === "offline") return <span className="tag warn">Offline</span>;
+  return <span className="tag warn">Backup</span>;
 }

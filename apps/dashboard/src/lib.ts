@@ -28,28 +28,28 @@ export type EventPayload = Record<string, unknown> & {
 };
 
 export const KIND: Record<string, { label: string; code: string; cls: string }> = {
-  recall_detected: { label: "Retiro detectado en openFDA", code: "Retiro", cls: "k-recall" },
-  patient_matched: { label: "Paciente que toma un fármaco retirado", code: "Paciente", cls: "k-patient" },
-  bulletin_generated: { label: "Boletín en español escrito por Claude", code: "Boletín", cls: "k-bulletin" },
-  alert_sent: { label: "Alerta enviada al paciente", code: "Alerta", cls: "k-alert" },
+  recall_detected: { label: "Recall detected on openFDA", code: "Recall", cls: "k-recall" },
+  patient_matched: { label: "Patient taking a recalled drug", code: "Patient", cls: "k-patient" },
+  bulletin_generated: { label: "Plain-language bulletin by Claude", code: "Bulletin", cls: "k-bulletin" },
+  alert_sent: { label: "Alert delivered to the patient", code: "Alert", cls: "k-alert" },
 };
 
-// Severidad FDA explicada en palabras de a pie. La fuente de verdad del "qué significa".
+// Severidad FDA explicada en palabras llanas: la fuente de verdad del "qué significa".
 export const CLASS_META: Record<"I" | "II" | "III", { name: string; risk: string; def: string }> = {
   I: {
-    name: "Clase I",
-    risk: "riesgo grave",
-    def: "Hay probabilidad razonable de que cause un daño serio a la salud, o la muerte.",
+    name: "Class I",
+    risk: "serious risk",
+    def: "Reasonable probability of serious harm to health, or death.",
   },
   II: {
-    name: "Clase II",
-    risk: "riesgo moderado",
-    def: "Puede causar un daño temporal o reversible; un daño serio es improbable.",
+    name: "Class II",
+    risk: "moderate risk",
+    def: "May cause temporary or reversible harm; serious harm is unlikely.",
   },
   III: {
-    name: "Clase III",
-    risk: "riesgo bajo",
-    def: "Es improbable que cause daño; incumple alguna norma de la FDA.",
+    name: "Class III",
+    risk: "low risk",
+    def: "Unlikely to cause harm; violates an FDA regulation.",
   },
 };
 
@@ -77,7 +77,7 @@ export function toDate(ts: string): Date {
 }
 
 export function hms(d: Date): string {
-  return d.toLocaleTimeString("es-MX", {
+  return d.toLocaleTimeString("en-US", {
     hour12: false,
     hour: "2-digit",
     minute: "2-digit",
@@ -87,13 +87,13 @@ export function hms(d: Date): string {
 
 export function rel(d: Date): string {
   const s = Math.round((Date.now() - d.getTime()) / 1000);
-  if (s < 0) return "ahora";
-  if (s < 60) return `hace ${s}s`;
+  if (s < 0) return "now";
+  if (s < 60) return `${s}s ago`;
   const m = Math.round(s / 60);
-  if (m < 60) return `hace ${m} min`;
+  if (m < 60) return `${m} min ago`;
   const h = Math.round(m / 60);
-  if (h < 24) return `hace ${h} h`;
-  return d.toLocaleDateString("es-MX");
+  if (h < 24) return `${h} h ago`;
+  return d.toLocaleDateString("en-US");
 }
 
 export async function fetchEvents(): Promise<EventsResult> {
@@ -157,7 +157,7 @@ export function fetchRecallDetail(id: string): Promise<RecallDetailResult | null
   return p;
 }
 
-/* ── Traducciones: del dato crudo de la FDA a español de a pie ───────── */
+/* ── Normalización: del dato crudo de la FDA a lenguaje llano ────────── */
 
 /** Limpia valores tipo "N/A" / "unknown" / vacío -> null. */
 export function clean(v?: string): string | null {
@@ -166,169 +166,135 @@ export function clean(v?: string): string | null {
   return s;
 }
 
-export function statusEs(s?: string): string | null {
+export function statusLabel(s?: string): string | null {
   const v = clean(s);
   if (!v) return null;
   const map: Record<string, string> = {
-    ongoing: "En curso",
-    completed: "Completado",
-    terminated: "Concluido",
-    pending: "Pendiente",
+    ongoing: "Ongoing",
+    completed: "Completed",
+    terminated: "Terminated",
+    pending: "Pending",
   };
   return map[v.toLowerCase()] ?? v;
 }
 
 export function statusTitle(s?: string): string | undefined {
   if ((s ?? "").toLowerCase() === "ongoing") {
-    return "El retiro sigue activo: aún puede haber producto afectado en circulación.";
+    return "The recall is still active: affected product may still be in circulation.";
   }
   return undefined;
 }
 
-export function voluntaryEs(v?: string): string | null {
+export function voluntaryLabel(v?: string): string | null {
   const s = clean(v);
   if (!s) return null;
-  if (/mandated|ordered/i.test(s)) return "Ordenado por la FDA";
-  if (/voluntary/i.test(s)) return "Voluntario, iniciado por la empresa";
+  if (/mandated|ordered/i.test(s)) return "Mandated by the FDA";
+  if (/voluntary/i.test(s)) return "Voluntary, initiated by the firm";
   return s;
 }
 
-export function notificationEs(n?: string): string | null {
+export function notificationLabel(n?: string): string | null {
   const s = clean(n);
   if (!s) return null;
-  if (/two or more/i.test(s)) return "avisó por varios medios";
+  if (/two or more/i.test(s)) return "notified through several channels";
   const map: Record<string, string> = {
-    letter: "avisó por carta",
-    "press release": "avisó por comunicado de prensa",
-    "e-mail": "avisó por correo electrónico",
-    email: "avisó por correo electrónico",
-    telephone: "avisó por teléfono",
-    fax: "avisó por fax",
-    visit: "avisó en persona",
+    letter: "notified by letter",
+    "press release": "notified by press release",
+    "e-mail": "notified by e-mail",
+    email: "notified by e-mail",
+    telephone: "notified by phone",
+    fax: "notified by fax",
+    visit: "notified in person",
   };
-  return map[s.toLowerCase()] ?? `avisó por ${s}`;
+  return map[s.toLowerCase()] ?? `notified by ${s}`;
 }
 
-export function countryEs(c?: string): string | null {
+export function countryShort(c?: string): string | null {
   const s = clean(c);
   if (!s) return null;
   const map: Record<string, string> = {
-    "united states": "EUA",
-    india: "India",
-    israel: "Israel",
-    canada: "Canadá",
-    china: "China",
-    germany: "Alemania",
-    switzerland: "Suiza",
-    japan: "Japón",
-    "united kingdom": "Reino Unido",
+    "united states": "USA",
+    "united kingdom": "UK",
   };
   return map[s.toLowerCase()] ?? s;
 }
 
-/** Ciudad/estado/país del fabricante -> "North Wales, PA (EUA)". */
+/** Ciudad/estado/país del fabricante -> "North Wales, PA (USA)". */
 export function firmPlace(d: RecallDetail): string | null {
   const parts = [clean(d.city), clean(d.state)].filter(Boolean).join(", ");
-  const country = countryEs(d.country);
+  const country = countryShort(d.country);
   if (parts && country) return `${parts} (${country})`;
   return parts || country;
 }
 
-/** "20181127" -> "27 nov 2018" (es-MX, sin sorpresas de zona horaria). */
+/** "20181127" -> "Nov 27, 2018" (sin sorpresas de zona horaria). */
 export function fmtFdaDate(s?: string): string | null {
   const v = clean(s);
   if (!v) return null;
   if (!/^\d{8}$/.test(v)) return v;
   const d = new Date(Number(v.slice(0, 4)), Number(v.slice(4, 6)) - 1, Number(v.slice(6, 8)));
-  return d
-    .toLocaleDateString("es-MX", { day: "numeric", month: "short", year: "numeric" })
-    .replace(/\./g, "");
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-/** "120,394 bottles" -> "120,394 frascos". Si no reconoce la unidad, regresa el crudo. */
-export function quantityEs(q?: string): string | null {
-  const s = clean(q);
-  if (!s) return null;
-  const m = /^([\d.,]+)\s+(.+)$/.exec(s);
-  if (!m) return s;
-  const units: Record<string, string> = {
-    bottles: "frascos",
-    bottle: "frascos",
-    tablets: "tabletas",
-    tablet: "tabletas",
-    capsules: "cápsulas",
-    cartons: "cajas",
-    carton: "cajas",
-    cases: "cajas",
-    bags: "bolsas",
-    vials: "viales",
-    units: "unidades",
-    packages: "paquetes",
-    packets: "sobres",
-    pouches: "sobres",
-    tubes: "tubos",
-    syringes: "jeringas",
-    kits: "kits",
-    blisters: "blísteres",
-  };
-  const unit = units[m[2].trim().toLowerCase()];
-  return unit ? `${m[1]} ${unit}` : s;
+/** La cantidad de openFDA ya viene en inglés; solo se limpia "N/A"/"unknown". */
+export function quantityLabel(q?: string): string | null {
+  return clean(q);
 }
 
 /** Patrón de distribución en una frase corta; el texto crudo va en title=. */
-export function distributionEs(d?: string): string | null {
+export function distributionLabel(d?: string): string | null {
   const s = clean(d);
   if (!s) return null;
   if (/nationwide/i.test(s)) {
     return /puerto rico/i.test(s)
-      ? "Todo EUA, incluido Puerto Rico"
-      : "Todo EUA (distribución nacional)";
+      ? "All of the U.S., including Puerto Rico"
+      : "All of the U.S. (nationwide)";
   }
   if (/^[A-Z]{2}(?:\s*,\s*[A-Z]{2})*\.?$/.test(s)) {
-    return `Solo algunos estados de EUA: ${s.replace(/\.$/, "")}`;
+    return `Only some U.S. states: ${s.replace(/\.$/, "")}`;
   }
   return s;
 }
 
 /**
  * El "en pocas palabras" del motivo: mapea las causas más comunes de recall
- * a una frase en español. Conservador: si no reconoce el patrón, no inventa.
+ * a una frase llana. Conservador: si no reconoce el patrón, no inventa.
  */
 export function reasonGist(r?: string): string | null {
   const s = clean(r);
   if (!s) return null;
   if (/N-?nitros|NDMA|NDEA|NMBA/i.test(s)) {
-    return "Se detectó una impureza del grupo de las nitrosaminas, asociada a riesgo de cáncer si la exposición es prolongada.";
+    return "A nitrosamine-class impurity was detected — linked to cancer risk with prolonged exposure.";
   }
   if (/declared strength/i.test(s)) {
-    return "La dosis impresa en el empaque puede no ser la real; hay que verificar caja y blíster.";
+    return "The strength printed on the package may not be the real one; check both carton and blister.";
   }
   if (/label/i.test(s)) {
-    return "Error de etiquetado: lo impreso en el empaque puede no corresponder al contenido.";
+    return "Labeling error: what is printed may not match the contents.";
   }
   if (/salmonella/i.test(s)) {
-    return "Contaminación con salmonela detectada por la FDA.";
+    return "Salmonella contamination detected by the FDA.";
   }
   if (/microb/i.test(s)) {
-    return "Posible contaminación microbiológica del producto.";
+    return "Possible microbial contamination of the product.";
   }
   if (/foreign (tablet|capsule|substance|material)/i.test(s)) {
-    return "Se encontró producto o material ajeno dentro del empaque.";
+    return "Foreign product or material was found inside the package.";
   }
   if (/steril/i.test(s)) {
-    return "No se puede garantizar que el producto sea estéril.";
+    return "Sterility of the product cannot be assured.";
   }
   if (/subpotent|superpotent|potency/i.test(s)) {
-    return "La concentración del fármaco está fuera de lo especificado.";
+    return "The drug's strength is out of specification.";
   }
   if (/dissolution/i.test(s)) {
-    return "Las tabletas no se disuelven como deben, lo que altera la dosis recibida.";
+    return "Tablets do not dissolve as intended, which alters the delivered dose.";
   }
   if (/stability/i.test(s)) {
-    return "El producto falló pruebas de estabilidad (no dura lo que promete la caducidad).";
+    return "Failed stability testing (may not last through its shelf life).";
   }
   if (/cgmp/i.test(s)) {
-    return "La FDA encontró desviaciones de buenas prácticas de manufactura.";
+    return "The FDA found deviations from good manufacturing practices.";
   }
   return null;
 }
@@ -351,7 +317,7 @@ export function parseCodeInfo(s?: string): { lots: string[]; ndcs: string[] } {
   return { lots, ndcs };
 }
 
-export function channelEs(c?: string): string {
+export function channelLabel(c?: string): string {
   const map: Record<string, string> = { slack: "Slack", gmail: "Gmail" };
   return map[(c ?? "").toLowerCase()] ?? (c ?? "");
 }

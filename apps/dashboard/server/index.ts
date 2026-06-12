@@ -52,7 +52,7 @@ async function serveStatic(res: import("node:http").ServerResponse, urlPath: str
     } catch {
       res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
       res.end(
-        "Dashboard sin compilar. Corre:  npm run build -w @farmavigia/dashboard",
+        "Dashboard not built yet. Run:  npm run build -w @farmavigia/dashboard",
       );
     }
   }
@@ -74,13 +74,13 @@ const server = createServer(async (req, res) => {
       const id = decodeURIComponent(url.slice("/api/recall/".length).split("?")[0] ?? "");
       if (!isValidRecallId(id)) {
         res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify({ error: "recall id inválido" }));
+        res.end(JSON.stringify({ error: "invalid recall id" }));
         return;
       }
       const detail = await getRecallDetail(id);
       if (!detail) {
         res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify({ error: "recall no encontrado" }));
+        res.end(JSON.stringify({ error: "recall not found" }));
         return;
       }
       res.writeHead(200, {
@@ -103,5 +103,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`📊 FarmacoVigía dashboard en http://localhost:${PORT}`);
+  console.log(`📊 FarmacoVigía dashboard at http://localhost:${PORT}`);
 });

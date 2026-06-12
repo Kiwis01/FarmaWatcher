@@ -34,7 +34,7 @@ export async function logEvent(kind: EventKind, payload: unknown): Promise<void>
     if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
   } catch (e) {
     console.warn(
-      `[event:${kind}] no se pudo escribir en ClickHouse (${(e as Error).message}). Payload:`,
+      `[event:${kind}] could not write to ClickHouse (${(e as Error).message}). Payload:`,
       payload,
     );
   }

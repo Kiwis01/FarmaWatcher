@@ -42,7 +42,7 @@ async function sendSlack(alert: Alert): Promise<ExecResult> {
   const text =
     `*${alert.title}*\n${alert.body}` +
     (alert.provenance.length
-      ? `\n\nFuentes:\n${alert.provenance.map((p) => `• ${p.url}`).join('\n')}`
+      ? `\n\nSources:\n${alert.provenance.map((p) => `• ${p.url}`).join('\n')}`
       : '');
   // El cuerpo va en markdown_text (no existe 'text'/'message' en este tool).
   // No mandar fallback_text: solo es válido junto con 'blocks'.
@@ -58,7 +58,7 @@ async function sendGmail(alert: Alert): Promise<ExecResult> {
   const body =
     `${alert.body}\n\n` +
     (alert.provenance.length
-      ? `Fuentes:\n${alert.provenance.map((p) => p.url).join('\n')}`
+      ? `Sources:\n${alert.provenance.map((p) => p.url).join('\n')}`
       : '');
   return composio().tools.execute('GMAIL_SEND_EMAIL', {
     userId: userId(),

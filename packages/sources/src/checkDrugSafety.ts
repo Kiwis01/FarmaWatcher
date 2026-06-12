@@ -9,7 +9,7 @@ import { mapClassification } from "./match";
 import { llmComplete } from "./llm";
 
 const DISCLAIMER =
-  "Información orientativa de farmacovigilancia generada automáticamente a partir de datos públicos de la FDA (openFDA). No sustituye el juicio clínico ni la consulta con un profesional de la salud.";
+  "Automatically generated pharmacovigilance information based on public FDA (openFDA) data. It does not replace clinical judgment or consultation with a healthcare professional.";
 
 function useSeed(): boolean {
   const v = process.env.USE_SEED;
@@ -71,10 +71,10 @@ function truncate(s: string, n: number): string {
 function oneFact(r: OpenFdaRecall): string {
   const cls = mapClassification(r.classification);
   const date = fmtDate(r.recall_initiation_date);
-  const firm = r.recalling_firm ? `, fabricante ${r.recalling_firm}` : "";
-  const when = date ? `, inició ${date}` : "";
-  const lot = r.code_info ? `, lote(s): ${truncate(r.code_info.replace(/\s+/g, " "), 70)}` : "";
-  return `recall ${r.recall_number} (Clase ${cls}, ${r.status}${when}${firm}) — ${r.reason_for_recall}${lot}`;
+  const firm = r.recalling_firm ? `, manufacturer ${r.recalling_firm}` : "";
+  const when = date ? `, initiated ${date}` : "";
+  const lot = r.code_info ? `, lot(s): ${truncate(r.code_info.replace(/\s+/g, " "), 70)}` : "";
+  return `recall ${r.recall_number} (Class ${cls}, ${r.status}${when}${firm}) — ${r.reason_for_recall}${lot}`;
 }
 
 async function buildBulletin(
@@ -83,8 +83,8 @@ async function buildBulletin(
   raw: FlaggedRaw[],
 ): Promise<string> {
   if (raw.length === 0) {
-    const who = req.patientId ? ` para el paciente ${req.patientId}` : "";
-    return `No se detectaron retiros (recalls) activos de la FDA${who} en los medicamentos revisados: ${drugs
+    const who = req.patientId ? ` for patient ${req.patientId}` : "";
+    return `No active FDA recalls were detected${who} for the reviewed medications: ${drugs
       .map((d) => d.input)
       .join(", ")}.`;
   }
@@ -95,17 +95,17 @@ async function buildBulletin(
 
   const model = process.env.LLM_MODEL ?? "claude-sonnet-4-6";
   const system =
-    "Eres un asistente de farmacovigilancia. Escribes en español claro y empático, " +
-    "para que un paciente sin formación médica entienda el riesgo y qué hacer. " +
-    "No inventes datos: usa solo los recalls proporcionados. Sé breve.";
+    "You are a pharmacovigilance assistant. You write in clear, empathetic English, " +
+    "so that a patient without medical training can understand the risk and what to do. " +
+    "Do not invent data: use only the recalls provided. Be brief.";
   const prompt =
-    `Genera un boletín de alerta${req.patientId ? ` para el paciente ${req.patientId}` : ""}.\n` +
-    `Medicamentos con retiros activos de la FDA:\n${facts}\n\n` +
-    `El boletín debe: (1) explicar en 1-2 frases qué se retiró y por qué, ` +
-    `(2) indicar la clase de riesgo (Clase I es la más grave), ` +
-    `(3) si hay número de lote o fecha, mencionar que revise su empaque, ` +
-    `(4) recomendar NO suspender el tratamiento por cuenta propia y consultar a su médico o farmacéutico. ` +
-    `Máximo ~140 palabras. No incluyas disclaimer (se agrega aparte).`;
+    `Write an alert bulletin${req.patientId ? ` for patient ${req.patientId}` : ""}.\n` +
+    `Medications with active FDA recalls:\n${facts}\n\n` +
+    `The bulletin must: (1) explain in 1-2 sentences what was recalled and why, ` +
+    `(2) state the risk class (Class I is the most serious), ` +
+    `(3) if there is a lot number or date, tell the patient to check their packaging, ` +
+    `(4) recommend NOT stopping treatment on their own and consulting their doctor or pharmacist. ` +
+    `Maximum ~140 words. Do not include a disclaimer (it is added separately).`;
 
   try {
     return await llmComplete(model, prompt, { system });
@@ -115,14 +115,14 @@ async function buildBulletin(
 }
 
 function templateBulletin(req: SafetyCheckRequest, facts: string): string {
-  const who = req.patientId ? ` (paciente ${req.patientId})` : "";
+  const who = req.patientId ? ` (patient ${req.patientId})` : "";
   return (
-    `⚠️ Alerta de farmacovigilancia${who}\n` +
-    `Se detectaron retiros (recalls) activos de la FDA en uno o más de tus medicamentos:\n` +
+    `⚠️ Pharmacovigilance alert${who}\n` +
+    `Active FDA recalls were detected for one or more of your medications:\n` +
     `${facts}\n\n` +
-    `Las Clases I/II indican un riesgo de salud relevante. ` +
-    `Revisa el número de lote en tu empaque si se indica arriba. ` +
-    `IMPORTANTE: no suspendas tu tratamiento por tu cuenta. ` +
-    `Contacta a tu médico o farmacéutico para revisar tu lote y posibles alternativas.`
+    `Class I/II recalls indicate a significant health risk. ` +
+    `Check the lot number on your packaging if listed above. ` +
+    `IMPORTANT: do not stop your treatment on your own. ` +
+    `Contact your doctor or pharmacist to review your lot and possible alternatives.`
   );
 }

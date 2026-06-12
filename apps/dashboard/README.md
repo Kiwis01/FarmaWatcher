@@ -1,8 +1,13 @@
 # @farmavigia/dashboard
 
-Frontend en **React + Vite** con un mini-servidor Node que sirve el build y expone
-`/api/events` (lee la tabla `events` de **ClickHouse** vía HTTP, con fallback al
-respaldo `demo/seed-data/events-backup.json` si la DB no responde — Plan B).
+Frontend en **React + Vite** con un mini-servidor Node que sirve el build y expone:
+
+- `/api/events` — lee la tabla `events` de **ClickHouse** vía HTTP, con fallback al
+  respaldo `demo/seed-data/events-backup.json` si la DB no responde (Plan B).
+- `/api/recall/:id` — dossier completo de un recall (motivo, fabricante, lotes,
+  distribución, cantidad, cronología). Resuelve primero contra el fixture
+  `demo/seed-data/recalls.json` (determinista, funciona offline) y si no está ahí,
+  consulta **openFDA** en vivo con caché en memoria.
 
 > Dueño: Persona A. No toca `analytics/dashboard/` de Persona B.
 

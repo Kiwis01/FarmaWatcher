@@ -20,7 +20,7 @@ export async function llmComplete(
   const base = process.env.LLM_BASE_URL;
   const key = process.env.LLM_API_KEY;
   if (!base || !key) {
-    throw new Error("LLM_BASE_URL/LLM_API_KEY no configurados");
+    throw new Error("LLM_BASE_URL/LLM_API_KEY not configured");
   }
 
   const messages: LlmMessage[] = [];
@@ -45,6 +45,6 @@ export async function llmComplete(
   }
   const data = (await res.json()) as ChatCompletion;
   const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new Error("LLM respondió sin contenido");
+  if (!content) throw new Error("LLM returned no content");
   return content.trim();
 }

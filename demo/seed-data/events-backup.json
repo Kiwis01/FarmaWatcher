@@ -12,7 +12,7 @@
   {
     "ts": "2026-06-12 17:40:05",
     "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-001\",\"chars\":531,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-001).\\nLa FDA reporta un retiro activo de tu medicamento Losartán: Teva retiró 2,924,000 tabletas (recall D-1455-2019, Clase II) porque se detectó la impureza NMBA en el ingrediente activo. La Clase II indica riesgo moderado: daño temporal o reversible, daño grave improbable. Revisa el número de lote en tu empaque (por ejemplo 1169752A o GS017387). IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para confirmar tu lote y valorar alternativas.\"}"
+    "payload": "{\"patientId\":\"PX-001\",\"chars\":522,\"bulletin\":\"⚠️ Pharmacovigilance alert (patient PX-001).\\nThe FDA reports an active recall of your medication Losartan: Teva recalled 2,924,000 tablets (recall D-1455-2019, Class II) after the impurity NMBA was detected in the active ingredient. Class II means moderate risk: temporary or reversible harm; serious harm is unlikely. Check the lot number on your package (for example 1169752A or GS017387). IMPORTANT: do not stop your treatment on your own; contact your doctor or pharmacist to confirm your lot and discuss alternatives.\"}"
   },
   {
     "ts": "2026-06-12 17:40:06",
@@ -32,7 +32,7 @@
   {
     "ts": "2026-06-12 17:40:12",
     "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-002\",\"chars\":488,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-002).\\nTu Metformina de liberación prolongada 750 mg (Amneal) tiene un retiro activo de la FDA: recall D-1349-2020, Clase II, por presencia de la impureza NDMA por encima del límite aceptable. Afecta a más de 50 lotes (códigos que inician con AM18, AM19 y AM20). No dejes de tomar tu metformina sin hablar antes con tu médico: suspender el tratamiento puede ser más riesgoso que la impureza. Lleva tu frasco a la farmacia para verificar el lote.\"}"
+    "payload": "{\"patientId\":\"PX-002\",\"chars\":449,\"bulletin\":\"⚠️ Pharmacovigilance alert (patient PX-002).\\nYour extended-release Metformin 750 mg (Amneal) has an active FDA recall: recall D-1349-2020, Class II, due to the impurity NDMA above the acceptable limit. It affects more than 50 lots (codes starting with AM18, AM19 and AM20). Do not stop taking your metformin without talking to your doctor first: stopping treatment can be riskier than the impurity. Take your bottle to the pharmacy to check the lot.\"}"
   },
   {
     "ts": "2026-06-12 17:40:13",
@@ -57,7 +57,7 @@
   {
     "ts": "2026-06-12 17:40:20",
     "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-004\",\"chars\":549,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-004).\\nTienes DOS retiros activos. 1) Clonazepam tabletas 0.125 mg (Endo/PAR): recall D-0179-2025, Clase I — la más grave — por un error de etiqueta: algunas cajas indican una dosis que no es la real; el blíster interior muestra la dosis correcta (lote 550174101). Verifica caja y blíster antes de tu próxima toma. 2) Ranitidina 150 mg (Granules India): recall D-0632-2020, Clase II, por la impureza NDMA. No suspendas ninguno por tu cuenta: llama hoy a tu médico o farmacéutico con tus empaques a la mano.\"}"
+    "payload": "{\"patientId\":\"PX-004\",\"chars\":560,\"bulletin\":\"⚠️ Pharmacovigilance alert (patient PX-004).\\nYou have TWO active recalls. 1) Clonazepam tablets 0.125 mg (Endo/PAR): recall D-0179-2025, Class I — the most serious — due to a labeling error: some cartons state a strength that is not the real one; the blister inside shows the correct strength (lot 550174101). Check carton and blister before your next dose. 2) Ranitidine 150 mg (Granules India): recall D-0632-2020, Class II, due to the NDMA impurity. Do not stop either medication on your own: call your doctor or pharmacist today with your packages at hand.\"}"
   },
   {
     "ts": "2026-06-12 17:40:21",
@@ -77,7 +77,7 @@
   {
     "ts": "2026-06-12 17:40:27",
     "kind": "bulletin_generated",
-    "payload": "{\"patientId\":\"PX-005\",\"chars\":519,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-005).\\nTu Amlodipino/Valsartán 5/160 mg (Teva) tiene un retiro activo de la FDA: recall D-0303-2019, Clase II, porque pruebas de laboratorio confirmaron la impureza NDEA. Se retiraron 120,394 frascos distribuidos en todo EUA y Puerto Rico. Lotes afectados: 23X017 a 23X024 (NDC 0093-7690-56 y 0093-7690-98). Revisa tu frasco: si tu lote aparece, tu farmacia puede cambiarlo. No suspendas el tratamiento sin consultar a tu médico: controlar tu presión sigue siendo prioritario.\"}"
+    "payload": "{\"patientId\":\"PX-005\",\"chars\":535,\"bulletin\":\"⚠️ Pharmacovigilance alert (patient PX-005).\\nYour Amlodipine/Valsartan 5/160 mg (Teva) has an active FDA recall: recall D-0303-2019, Class II, after laboratory testing confirmed the impurity NDEA. 120,394 bottles distributed across the U.S. and Puerto Rico were recalled. Affected lots: 23X017 through 23X024 (NDC 0093-7690-56 and 0093-7690-98). Check your bottle: if your lot is listed, your pharmacy can replace it. Do not stop treatment without talking to your doctor: keeping your blood pressure under control remains the priority.\"}"
   },
   {
     "ts": "2026-06-12 17:40:28",
