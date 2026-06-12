@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchEvents,
   toDate,
-  rel,
+  hms,
   parse,
   KIND,
   type EventsResult,
@@ -12,9 +12,9 @@ import {
 
 const KIND_KEYS = ["recall_detected", "patient_matched", "bulletin_generated", "alert_sent"];
 
-function ClassPill({ c }: { c?: string }) {
+function ClassTag({ c }: { c?: string }) {
   if (!c) return null;
-  return <span className={`pill cls-${c}`}>Clase {c}</span>;
+  return <span className={`cls cls-${c}`}>Clase {c}</span>;
 }
 
 function Summary({ kind, d }: { kind: string; d: EventPayload }) {
@@ -22,36 +22,43 @@ function Summary({ kind, d }: { kind: string; d: EventPayload }) {
     case "recall_detected":
       return (
         <>
-          {d.drug} ·{" "}
+          <strong>{d.drug}</strong>
           {d.sourceUrl ? (
             <a href={d.sourceUrl} target="_blank" rel="noreferrer" className="lnk">
-              recall {d.recallId} ↗
+              {d.recallId}
+              <span className="ext" aria-hidden="true">
+                ↗
+              </span>
             </a>
           ) : (
-            <>recall {d.recallId}</>
-          )}{" "}
-          <ClassPill c={d.classification} />
+            <span className="data">{d.recallId}</span>
+          )}
+          <ClassTag c={d.classification} />
         </>
       );
     case "patient_matched":
       return (
         <>
-          {d.name || d.patientId}
-          {d.patientId ? ` (${d.patientId})` : ""}
-          {d.drugs ? ` · ${(d.drugs ?? []).join(", ")}` : ""}
+          <strong>{d.name || d.patientId}</strong>
+          {d.patientId && <span className="data">{d.patientId}</span>}
+          {d.drugs && d.drugs.length > 0 && <span>{d.drugs.join(", ")}</span>}
         </>
       );
     case "bulletin_generated":
       return (
         <>
-          Paciente {d.patientId} · {d.chars ?? 0} caracteres
+          <span>Paciente</span>
+          <span className="data">{d.patientId}</span>
+          <span className="faint">{d.chars ?? 0} caracteres</span>
         </>
       );
     case "alert_sent":
       return (
         <>
-          Paciente {d.patientId} · {d.channel} ·{" "}
-          {d.ok ? "✅ enviada" : "⚠️ falló"} ({d.ref})
+          <span className="data">{d.patientId}</span>
+          <span>{d.channel}</span>
+          {d.ok ? <span className="ok">✓ enviada</span> : <span className="fail">✗ falló</span>}
+          <span className="data">{d.ref}</span>
         </>
       );
     default:
@@ -66,6 +73,10 @@ export default function App() {
   const [activeKinds, setActiveKinds] = useState<Set<string>>(new Set(KIND_KEYS));
   const [patientFilter, setPatientFilter] = useState<string | null>(null);
 
+  // Revelado escalonado solo en la primera carga; las filas nuevas entran sin retraso.
+  const firstBatch = useRef(true);
+  const delays = useRef(new Map<string, number>());
+
   useEffect(() => {
     let alive = true;
     const load = async () => {
@@ -74,7 +85,7 @@ export default function App() {
         if (!alive) return;
         setData(res);
         setOffline(false);
-        setUpdated(new Date().toLocaleTimeString("es-MX"));
+        setUpdated(hms(new Date()));
       } catch {
         if (alive) setOffline(true);
       }
@@ -86,6 +97,10 @@ export default function App() {
       clearInterval(id);
     };
   }, []);
+
+  useEffect(() => {
+    if (data) firstBatch.current = false;
+  }, [data]);
 
   const events = useMemo(
     () =>
@@ -154,10 +169,10 @@ export default function App() {
   const source = offline ? "offline" : (data?.source ?? "backup");
 
   const stats = [
-    { label: "Eventos totales", value: events.length, cls: "" },
-    { label: "Recalls únicos", value: recallsById.size, cls: "s-recall" },
-    { label: "Pacientes afectados", value: patients.length, cls: "s-patient" },
-    { label: "Alertas enviadas", value: events.filter((e) => e.kind === "alert_sent").length, cls: "s-alert" },
+    { label: "Eventos", value: events.length },
+    { label: "Recalls únicos", value: recallsById.size },
+    { label: "Pacientes afectados", value: patients.length },
+    { label: "Alertas enviadas", value: events.filter((e) => e.kind === "alert_sent").length },
   ];
 
   const toggleKind = (k: string) => {
@@ -171,74 +186,90 @@ export default function App() {
 
   return (
     <div className="wrap">
-      <header className="topbar">
+      <header className="top">
         <div className="brand">
-          <div className="brand-mark">℞</div>
+          <span className="mark" aria-hidden="true" />
           <div>
             <h1>FarmacoVigía</h1>
-            <p>Centro de eventos de farmacovigilancia</p>
+            <p>Centro de eventos · Farmacovigilancia</p>
           </div>
         </div>
         <div className="status">
           <SourceBadge source={source} />
           <span className="live">
-            <span className="dot" /> En vivo
+            <span className="dot" aria-hidden="true" />
+            En vivo
           </span>
-          <span className="muted">Actualizado {updated}</span>
+          <span className="clock">Actualizado {updated}</span>
         </div>
       </header>
 
-      <section className="stats">
+      <section className="band" aria-label="Cifras">
         {stats.map((s) => (
-          <div key={s.label} className={`stat ${s.cls}`}>
-            <div className="label">{s.label}</div>
-            <div className="value">{s.value}</div>
+          <div key={s.label} className="cell">
+            <div className="num">{s.value}</div>
+            <div className="cap">{s.label}</div>
           </div>
         ))}
       </section>
 
       {patientFilter && (
         <div className="filterbar">
-          Filtrando por paciente <b>{patientFilter}</b>
+          <span>
+            Filtrando paciente <strong>{patientFilter}</strong>
+          </span>
           <button className="clear" onClick={() => setPatientFilter(null)}>
-            ✕ quitar filtro
+            ✕ Quitar filtro
           </button>
         </div>
       )}
 
       <div className="grid">
-        <section className="panel">
-          <div className="panel-head">
+        <section className="col-feed">
+          <div className="sec-head">
             <h2>Flujo de eventos</h2>
-            <div className="chips">
+            <div className="chips" role="group" aria-label="Filtrar por tipo">
               {KIND_KEYS.map((k) => (
                 <button
                   key={k}
-                  className={`chip ${KIND[k]?.cls ?? ""} ${activeKinds.has(k) ? "on" : ""}`}
+                  className={`chip ${activeKinds.has(k) ? "on" : ""}`}
+                  aria-pressed={activeKinds.has(k)}
                   onClick={() => toggleKind(k)}
                 >
-                  {KIND[k]?.icon} {KIND[k]?.label}
+                  {KIND[k]?.code}
                 </button>
               ))}
             </div>
           </div>
           {feed.length === 0 ? (
-            <p className="empty">Sin eventos para este filtro.</p>
+            <p className="empty">
+              Sin eventos con este filtro. Activa más tipos arriba o quita el filtro de
+              paciente.
+            </p>
           ) : (
             <ol className="feed">
               {feed.map((e: EventRow, i: number) => {
-                const meta = KIND[e.kind] ?? { label: e.kind, icon: "•", cls: "" };
+                const meta = KIND[e.kind] ?? { label: e.kind, code: e.kind, cls: "" };
                 const d = parse(e.payload);
+                const key = `${e.ts}|${e.kind}|${e.payload}`;
+                let delay = delays.current.get(key);
+                if (delay === undefined) {
+                  delay = firstBatch.current ? Math.min(i, 14) * 40 : 0;
+                  delays.current.set(key, delay);
+                }
                 return (
-                  <li key={`${e.ts}-${i}`} className={`ev ${meta.cls}`}>
-                    <div className="ic">{meta.icon}</div>
+                  <li
+                    key={key}
+                    className={`ev ${meta.cls}`}
+                    style={delay ? { animationDelay: `${delay}ms` } : undefined}
+                  >
+                    <time className="t">{hms(toDate(e.ts))}</time>
+                    <span className="code" title={meta.label}>
+                      {meta.code}
+                    </span>
                     <div className="body">
-                      <div className="title">{meta.label}</div>
-                      <div className="sub">
-                        <Summary kind={e.kind} d={d} />
-                      </div>
+                      <Summary kind={e.kind} d={d} />
                     </div>
-                    <div className="time">{rel(toDate(e.ts))}</div>
                   </li>
                 );
               })}
@@ -246,57 +277,79 @@ export default function App() {
           )}
         </section>
 
-        <div className="side">
-          <section className="panel">
+        <aside className="rail">
+          <section>
             <h2>Recalls por clase</h2>
             <ClassChart counts={classCounts} />
           </section>
 
-          <section className="panel">
+          <section>
             <h2>Pacientes afectados</h2>
             {patients.length === 0 ? (
-              <p className="empty">Ninguno todavía.</p>
+              <p className="empty">Ninguno todavía — el agente está vigilando.</p>
             ) : (
               <ul className="patients">
                 {patients.map((p) => (
-                  <li
-                    key={p.id}
-                    className={`pt ${patientFilter === p.id ? "sel" : ""}`}
-                    onClick={() => setPatientFilter(patientFilter === p.id ? null : p.id)}
-                  >
-                    <span className={`sev sev-${p.worst}`} title={`Peor clase: ${p.worst}`} />
-                    <span className="pt-name">{p.name}</span>
-                    <span className="pt-drugs">{p.drugs.join(", ")}</span>
+                  <li key={p.id}>
+                    <button
+                      className={`pt ${patientFilter === p.id ? "sel" : ""}`}
+                      aria-pressed={patientFilter === p.id}
+                      onClick={() =>
+                        setPatientFilter(patientFilter === p.id ? null : p.id)
+                      }
+                    >
+                      <span
+                        className={`rn rn-${p.worst}`}
+                        title={`Peor clase: ${p.worst}`}
+                      >
+                        {p.worst}
+                      </span>
+                      <span className="pt-name">{p.name}</span>
+                      <span className="pt-drugs">{p.drugs.join(", ")}</span>
+                    </button>
                   </li>
                 ))}
               </ul>
             )}
           </section>
 
-          <section className="panel">
-            <h2>Boletines (Claude)</h2>
+          <section>
+            <h2>Boletines · Claude</h2>
             {bulletins.length === 0 ? (
-              <p className="empty">Aún no hay boletines.</p>
+              <p className="empty">
+                Aún no hay boletines. Se generan cuando un recall coincide con un
+                paciente.
+              </p>
             ) : (
               <div className="bulletins">
                 {bulletins.map((d, i) => (
-                  <div key={`${d.patientId}-${i}`} className="bull">
+                  <article key={`${d.patientId}-${i}`} className="bull">
                     <div className="who">Paciente {d.patientId}</div>
-                    <div className="txt">{d.bulletin}</div>
-                  </div>
+                    <p className="txt">{d.bulletin}</p>
+                  </article>
                 ))}
               </div>
             )}
           </section>
-        </div>
+        </aside>
       </div>
 
-      <footer className="sponsors">
-        <span>Datos en <b>ClickHouse</b></span>
-        <span>Deploy en <b>Render</b></span>
-        <span>LLM vía <b>TrueFoundry</b></span>
-        <span>Alertas vía <b>Composio</b></span>
-        <span>Fuente <b>openFDA</b></span>
+      <footer className="creds">
+        <span>
+          Datos <b>ClickHouse</b>
+        </span>
+        <span>
+          Deploy <b>Render</b>
+        </span>
+        <span>
+          LLM <b>TrueFoundry</b>
+        </span>
+        <span>
+          Alertas <b>Composio</b>
+        </span>
+        <span>
+          Fuente <b>openFDA</b>
+        </span>
       </footer>
     </div>
   );
@@ -318,12 +371,14 @@ function ClassChart({ counts }: { counts: Record<string, number> }) {
       {rows.map((r) => {
         const v = counts[r.c] ?? 0;
         return (
-          <div key={r.c} className="chart-row">
-            <span className="chart-label">{r.label}</span>
-            <div className="chart-track">
-              <div className={`chart-bar bar-${r.c}`} style={{ width: `${(v / max) * 100}%` }} />
+          <div key={r.c} className="crow" title={r.label}>
+            <span className={`rn rn-${r.c}`}>{r.c}</span>
+            <div className="track">
+              {v > 0 && (
+                <div className={`fill f-${r.c}`} style={{ width: `${(v / max) * 100}%` }} />
+              )}
             </div>
-            <span className="chart-val">{v}</span>
+            <span className="cval">{v}</span>
           </div>
         );
       })}
@@ -332,8 +387,8 @@ function ClassChart({ counts }: { counts: Record<string, number> }) {
 }
 
 function SourceBadge({ source }: { source: string }) {
-  if (source === "clickhouse") return <span className="badge ok">● ClickHouse</span>;
-  if (source === "local") return <span className="badge ok">● Worker (en vivo)</span>;
-  if (source === "offline") return <span className="badge warn">● Sin conexión</span>;
-  return <span className="badge warn">● Respaldo</span>;
+  if (source === "clickhouse") return <span className="tag ok">ClickHouse</span>;
+  if (source === "local") return <span className="tag ok">Fuente · Worker</span>;
+  if (source === "offline") return <span className="tag warn">Sin conexión</span>;
+  return <span className="tag warn">Respaldo</span>;
 }

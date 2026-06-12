@@ -26,11 +26,11 @@ export type EventPayload = Record<string, unknown> & {
   ref?: string;
 };
 
-export const KIND: Record<string, { label: string; icon: string; cls: string }> = {
-  recall_detected: { label: "Recall detectado", icon: "⚠️", cls: "k-recall" },
-  patient_matched: { label: "Paciente afectado", icon: "🧑‍⚕️", cls: "k-patient" },
-  bulletin_generated: { label: "Boletín generado", icon: "📝", cls: "k-bulletin" },
-  alert_sent: { label: "Alerta enviada", icon: "📣", cls: "k-alert" },
+export const KIND: Record<string, { label: string; code: string; cls: string }> = {
+  recall_detected: { label: "Recall detectado", code: "Recall", cls: "k-recall" },
+  patient_matched: { label: "Paciente afectado", code: "Paciente", cls: "k-patient" },
+  bulletin_generated: { label: "Boletín generado", code: "Boletín", cls: "k-bulletin" },
+  alert_sent: { label: "Alerta enviada", code: "Alerta", cls: "k-alert" },
 };
 
 export function parse(p: string): EventPayload {
@@ -45,6 +45,15 @@ export function toDate(ts: string): Date {
   const s = String(ts);
   const d = new Date(s.replace(" ", "T") + (s.includes("Z") ? "" : "Z"));
   return isNaN(d.getTime()) ? new Date(ts) : d;
+}
+
+export function hms(d: Date): string {
+  return d.toLocaleTimeString("es-MX", {
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
 export function rel(d: Date): string {
