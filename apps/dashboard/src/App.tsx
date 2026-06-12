@@ -108,7 +108,7 @@ function Summary({
           <strong>{(d.patientId && names.get(d.patientId)) || d.patientId}</strong>
           <span>alerted via {channelLabel(d.channel)}</span>
           {d.ok ? <span className="ok">✓ delivered</span> : <span className="fail">✗ failed</span>}
-          {d.ref === "dry-run" ? (
+          {d.ref?.startsWith("dry-run") ? (
             <span className="faint">dry run</span>
           ) : (
             d.ref && <span className="data">{d.ref}</span>
