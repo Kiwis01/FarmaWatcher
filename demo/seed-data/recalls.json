@@ -1,0 +1,50 @@
+[
+  {
+    "recall_number": "D-0573-2019",
+    "classification": "Class II",
+    "reason_for_recall": "Detección de impureza N-Nitroso-N-metil-4-aminobutyric acid (NMBA) por encima del límite aceptable de ingesta diaria.",
+    "status": "Ongoing",
+    "product_description": "Losartan Potassium Tablets USP, 50 mg",
+    "openfda": {
+      "brand_name": ["Losartan Potassium"],
+      "generic_name": ["LOSARTAN POTASSIUM"],
+      "substance_name": ["LOSARTAN POTASSIUM"]
+    }
+  },
+  {
+    "recall_number": "D-1924-2020",
+    "classification": "Class II",
+    "reason_for_recall": "Presencia de N-Nitrosodimethylamine (NDMA) por encima del límite establecido por la FDA.",
+    "status": "Ongoing",
+    "product_description": "Metformin Hydrochloride Extended-Release Tablets, 500 mg",
+    "openfda": {
+      "brand_name": ["Metformin Hydrochloride ER"],
+      "generic_name": ["METFORMIN HYDROCHLORIDE"],
+      "substance_name": ["METFORMIN HYDROCHLORIDE"]
+    }
+  },
+  {
+    "recall_number": "D-2150-2019",
+    "classification": "Class I",
+    "reason_for_recall": "Contaminación con N-Nitrosodimethylamine (NDMA), un probable carcinógeno humano, por encima de los niveles aceptables.",
+    "status": "Ongoing",
+    "product_description": "Ranitidine Tablets, 150 mg",
+    "openfda": {
+      "brand_name": ["Ranitidine"],
+      "generic_name": ["RANITIDINE HYDROCHLORIDE"],
+      "substance_name": ["RANITIDINE HYDROCHLORIDE"]
+    }
+  },
+  {
+    "recall_number": "D-1010-2018",
+    "classification": "Class II",
+    "reason_for_recall": "Presencia de la impureza N-Nitrosodimethylamine (NDMA) detectada en el ingrediente farmacéutico activo.",
+    "status": "Ongoing",
+    "product_description": "Valsartan Tablets, 160 mg",
+    "openfda": {
+      "brand_name": ["Valsartan"],
+      "generic_name": ["VALSARTAN"],
+      "substance_name": ["VALSARTAN"]
+    }
+  }
+]

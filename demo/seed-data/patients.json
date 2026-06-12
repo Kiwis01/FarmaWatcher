@@ -1,0 +1,7 @@
+[
+  { "id": "PX-001", "name": "María González", "drugs": ["Losartan", "Aspirin"] },
+  { "id": "PX-002", "name": "Juan Pérez", "drugs": ["Metformin", "Atorvastatin"] },
+  { "id": "PX-003", "name": "Ana Ramírez", "drugs": ["Ibuprofen"] },
+  { "id": "PX-004", "name": "Carlos Hernández", "drugs": ["Ranitidine", "Omeprazole"] },
+  { "id": "PX-005", "name": "Lucía Torres", "drugs": ["Valsartan"] }
+]

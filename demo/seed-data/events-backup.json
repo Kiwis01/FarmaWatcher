@@ -1,0 +1,82 @@
+[
+  {
+    "ts": "2026-06-12 17:40:02",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-001\",\"drug\":\"Losartan\",\"recallId\":\"D-0573-2019\",\"classification\":\"II\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0573-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:03",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-001\",\"name\":\"María González\",\"drugs\":[\"Losartan\"]}"
+  },
+  {
+    "ts": "2026-06-12 17:40:05",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-001\",\"chars\":372,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-001).\\nSe detectó un retiro activo de la FDA en tu medicamento Losartan: recall D-0573-2019 (Clase II) por la impureza NMBA por encima del límite aceptable. La Clase II indica un riesgo de salud relevante. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:06",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-001\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:09",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-002\",\"drug\":\"Metformin\",\"recallId\":\"D-1924-2020\",\"classification\":\"II\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-1924-2020%22\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:10",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-002\",\"name\":\"Juan Pérez\",\"drugs\":[\"Metformin\"]}"
+  },
+  {
+    "ts": "2026-06-12 17:40:12",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-002\",\"chars\":368,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-002).\\nSe detectó un retiro activo de la FDA en tu medicamento Metformin: recall D-1924-2020 (Clase II) por la presencia de NDMA por encima del límite establecido. La Clase II indica un riesgo de salud relevante. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:13",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-002\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:16",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-004\",\"drug\":\"Ranitidine\",\"recallId\":\"D-2150-2019\",\"classification\":\"I\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-2150-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:17",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-004\",\"name\":\"Carlos Hernández\",\"drugs\":[\"Ranitidine\"]}"
+  },
+  {
+    "ts": "2026-06-12 17:40:19",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-004\",\"chars\":404,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-004).\\nSe detectó un retiro activo de la FDA en tu medicamento Ranitidine: recall D-2150-2019 (Clase I) por contaminación con NDMA, un probable carcinógeno humano. La Clase I es la más grave. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta cuanto antes a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:20",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-004\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:23",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-005\",\"drug\":\"Valsartan\",\"recallId\":\"D-1010-2018\",\"classification\":\"II\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-1010-2018%22\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:24",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-005\",\"name\":\"Lucía Torres\",\"drugs\":[\"Valsartan\"]}"
+  },
+  {
+    "ts": "2026-06-12 17:40:26",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-005\",\"chars\":366,\"bulletin\":\"⚠️ Alerta de farmacovigilancia (paciente PX-005).\\nSe detectó un retiro activo de la FDA en tu medicamento Valsartan: recall D-1010-2018 (Clase II) por la impureza NDMA en el ingrediente activo. La Clase II indica un riesgo de salud relevante. IMPORTANTE: no suspendas tu tratamiento por tu cuenta; contacta a tu médico o farmacéutico para revisar tu lote y posibles alternativas.\"}"
+  },
+  {
+    "ts": "2026-06-12 17:40:27",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-005\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run\"}"
+  }
+]
