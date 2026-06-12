@@ -19,6 +19,7 @@ import {
   reasonGist,
   parseCodeInfo,
   channelLabel,
+  plainBulletin,
   wordsOf,
   clean,
   type EventsResult,
@@ -524,9 +525,7 @@ export default function App() {
                     <div className="who">
                       For {(d.patientId && names.get(d.patientId)) || `patient ${d.patientId}`}
                     </div>
-                    <p className="txt">
-                      {(d.bulletin ?? "").replace(/^[\s\p{Extended_Pictographic}️]+/u, "")}
-                    </p>
+                    <p className="txt">{plainBulletin(d.bulletin)}</p>
                   </article>
                 ))}
               </div>

@@ -322,6 +322,20 @@ export function channelLabel(c?: string): string {
   return map[(c ?? "").toLowerCase()] ?? (c ?? "");
 }
 
+/**
+ * Los boletines llegan con markdown de Slack (#, **, `). Para el dashboard
+ * los aplanamos a texto llano; el emoji/encabezado inicial también se quita.
+ */
+export function plainBulletin(s?: string): string {
+  return (s ?? "")
+    .replace(/^[#\s\p{Extended_Pictographic}️]+/u, "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .trim();
+}
+
 /** Palabras de un boletín (preferimos contar el texto; chars/6 como aproximación). */
 export function wordsOf(bulletin?: string, chars?: number): number {
   if (bulletin?.trim()) return bulletin.trim().split(/\s+/).length;
