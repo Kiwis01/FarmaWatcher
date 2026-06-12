@@ -45,9 +45,10 @@ async function sendSlack(alert: Alert): Promise<ExecResult> {
       ? `\n\nFuentes:\n${alert.provenance.map((p) => `• ${p.url}`).join('\n')}`
       : '');
   // El cuerpo va en markdown_text (no existe 'text'/'message' en este tool).
+  // No mandar fallback_text: solo es válido junto con 'blocks'.
   return composio().tools.execute('SLACK_SEND_MESSAGE', {
     userId: userId(),
-    arguments: { channel, markdown_text: text, fallback_text: alert.title },
+    arguments: { channel, markdown_text: text },
   }) as Promise<ExecResult>;
 }
 
