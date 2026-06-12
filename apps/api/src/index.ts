@@ -1,7 +1,11 @@
-import 'dotenv/config';
+import { config } from 'dotenv';
 import express from 'express';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+
+const __dirnameEnv = dirname(fileURLToPath(import.meta.url));
+// Carga .env de la raíz del repo (funciona en dev tsx y en dist compilado).
+config({ path: resolve(__dirnameEnv, '../../../.env') });
 import type {
   Alert,
   CheckDrugSafety,

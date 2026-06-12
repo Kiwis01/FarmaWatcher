@@ -1,7 +1,12 @@
 // Prueba manual: publica una alerta de ejemplo.
 //   npm run notifier:demo            (usa DRY_RUN/.env)
-// Carga .env de la raíz si existe.
-import 'dotenv/config';
+// Carga .env de la raíz del repo aunque se corra desde el workspace.
+import { config } from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, '../../../.env') });
+
 import { postAlert } from './index.js';
 import type { Alert } from '@farmacovigia/shared';
 
