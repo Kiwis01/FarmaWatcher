@@ -6,7 +6,7 @@ import type {
 import { fetchRecalls, matchSeed, type OpenFdaRecall } from "./openfda";
 import { isActive, toRecallHit, severityRank, dedupeByRecall } from "./match";
 import { mapClassification } from "./match";
-import { llmComplete } from "./llm";
+import { llmPromptComplete } from "./llm";
 
 const DISCLAIMER =
   "Automatically generated pharmacovigilance information based on public FDA (openFDA) data. It does not replace clinical judgment or consultation with a healthcare professional.";
@@ -94,21 +94,17 @@ async function buildBulletin(
     .join("\n");
 
   const model = process.env.LLM_MODEL ?? "claude-sonnet-4-6";
-  const system =
-    "You are a pharmacovigilance assistant. You write in clear, empathetic English, " +
-    "so that a patient without medical training can understand the risk and what to do. " +
-    "Do not invent data: use only the recalls provided. Be brief.";
-  const prompt =
-    `Write an alert bulletin${req.patientId ? ` for patient ${req.patientId}` : ""}.\n` +
-    `Medications with active FDA recalls:\n${facts}\n\n` +
-    `The bulletin must: (1) explain in 1-2 sentences what was recalled and why, ` +
-    `(2) state the risk class (Class I is the most serious), ` +
-    `(3) if there is a lot number or date, tell the patient to check their packaging, ` +
-    `(4) recommend NOT stopping treatment on their own and consulting their doctor or pharmacist. ` +
-    `Maximum ~140 words. Do not include a disclaimer (it is added separately).`;
+  const promptFqn = process.env.LLM_PROMPT_FQN ?? "";
 
   try {
-    return await llmComplete(model, prompt, { system });
+    // El prompt del boletín vive en el Prompt Registry de TrueFoundry
+    // (LLM_PROMPT_FQN), no en el código. Variables: {{patient_id}}, {{facts}}.
+    if (!promptFqn) throw new Error("LLM_PROMPT_FQN not configured");
+    return await llmPromptComplete(
+      promptFqn,
+      { patient_id: req.patientId ?? "unknown", facts },
+      { model },
+    );
   } catch {
     return templateBulletin(req, facts);
   }

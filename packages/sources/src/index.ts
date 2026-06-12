@@ -1,7 +1,7 @@
 // Punto de entrada de packages/sources (dominio + datos de Persona A).
 // Contrato A -> B: `checkDrugSafety` (la consume apps/api de Persona B).
 export { checkDrugSafety } from "./checkDrugSafety";
-export { llmComplete, type LlmMessage } from "./llm";
+export { llmComplete, llmPromptComplete, type LlmMessage } from "./llm";
 export {
   fetchRecalls,
   matchSeed,
