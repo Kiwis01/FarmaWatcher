@@ -1,5 +1,5 @@
 /* ============================================================
-   FarmacoVigía — panel de instrumentos clínico
+   FarmaWatcher — panel de instrumentos clínico
    Grafito cálido · hairlines · numerales finos · rojo señal
    Sora (display) · Schibsted Grotesk (UI) · Fragment Mono (datos)
    ============================================================ */
@@ -97,7 +97,6 @@ button {
 .rc-note,
 .rc-src,
 .lname,
-.wr-meta,
 .wire-src,
 .rail h2 {
   font-family: var(--font-mono);
@@ -885,95 +884,52 @@ button.lot:hover {
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Cable openFDA: todos los fármacos, no solo el padrón ── */
-.wire-note {
-  margin: 0 0 14px;
-  font-size: 12px;
-  line-height: 1.55;
+/* ── Selector de alcance: el padrón o el cable completo de la FDA ── */
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.seg button {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  padding: 7px 12px;
+  background: none;
+  border: none;
   color: var(--ink-3);
-  max-width: 38ch;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
 }
-
-.wire {
-  list-style: none;
-  margin: 0;
-  padding: 0 6px 0 0;
-  border-top: 1px solid var(--line);
-  max-height: 420px;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-2) transparent;
+.seg button + button {
+  border-left: 1px solid var(--line-2);
 }
-.wire::-webkit-scrollbar {
-  width: 6px;
+.seg button:hover {
+  color: var(--ink-2);
 }
-.wire::-webkit-scrollbar-thumb {
-  background: var(--line-2);
-  border-radius: 3px;
-}
-
-.wr {
-  display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-.wr .rn {
-  padding-top: 2px;
-}
-
-.wr-body {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-.wr-line {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.wr-drug {
-  font-size: 13px;
-  font-weight: 550;
+.seg button.on {
+  background: var(--raise-2);
   color: var(--ink);
-  text-decoration: none;
 }
-.wr-drug:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--ink-3);
-  text-underline-offset: 3px;
+.seg .n {
+  margin-left: 7px;
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
 }
 
-/* El cruce con el padrón: la ficha que conecta el cable con los dossiers */
-.wr-hit {
+/* El cruce con el padrón: la ficha que conecta el cable con los pacientes */
+.rc-hit {
   font-family: var(--font-mono);
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  padding: 2px 6px;
+  padding: 2.5px 7px;
   border: 1px solid var(--line-2);
   border-radius: 3px;
   color: var(--ink-2);
   white-space: nowrap;
-}
-
-.wr-why {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--ink-3);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.wr-meta {
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
 }
 
 .wire-src {

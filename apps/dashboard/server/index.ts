@@ -13,6 +13,7 @@ import {
   readJsonBody,
   validateNewPatient,
 } from "./registry";
+import { alertNewPatient, type InstantAlertResult } from "./alerts";
 
 loadEnv();
 
@@ -139,8 +140,16 @@ const server = createServer(async (req, res) => {
           return;
         }
         const patient = addPatient(valid.name, valid.drugs);
+        // Alerta inmediata: si el doctor confirmó un fármaco con recall
+        // ("Add anyway"), el aviso a Slack sale ahora, no en la pasada del worker.
+        let alert: InstantAlertResult;
+        try {
+          alert = await alertNewPatient(patient);
+        } catch (e) {
+          alert = { alerted: false, error: (e as Error).message };
+        }
         res.writeHead(201, { "Content-Type": "application/json; charset=utf-8" });
-        res.end(JSON.stringify({ patient }));
+        res.end(JSON.stringify({ patient, alert }));
         return;
       }
       res.writeHead(200, {
@@ -163,5 +172,5 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`📊 FarmacoVigía dashboard at http://localhost:${PORT}`);
+  console.log(`📊 FarmaWatcher dashboard at http://localhost:${PORT}`);
 });

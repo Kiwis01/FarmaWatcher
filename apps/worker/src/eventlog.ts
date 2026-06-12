@@ -4,6 +4,10 @@ import { logEvent, type EventKind } from "./clickhouse";
 
 // Espejo local de eventos: permite que el dashboard se vea "vivo" con datos reales
 // SIN depender de ClickHouse (que aún no entrega Person B). Es un log rotativo.
+//
+// Sin buffer en memoria: el server del dashboard también escribe este archivo
+// (alertas inmediatas), así que cada evento se registra con read-merge-write
+// para no clobberear lo que escribió el otro proceso.
 const LIVE_PATH = fileURLToPath(
   new URL("../../../demo/seed-data/events-live.json", import.meta.url),
 );
@@ -15,16 +19,12 @@ interface Row {
   payload: string;
 }
 
-let buffer: Row[] | null = null;
-
 function load(): Row[] {
-  if (buffer) return buffer;
   try {
-    buffer = JSON.parse(readFileSync(LIVE_PATH, "utf8")) as Row[];
+    return JSON.parse(readFileSync(LIVE_PATH, "utf8")) as Row[];
   } catch {
-    buffer = [];
+    return [];
   }
-  return buffer;
 }
 
 function nowDateTime(): string {

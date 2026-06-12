@@ -97,18 +97,38 @@ export default function AddPatient() {
     setSaving(true);
     setNote(null);
     try {
+      // El POST corre el pipeline completo si hay recall (boletín + Slack):
+      // puede tardar varios segundos, de ahí el timeout largo.
       const r = await fetch("/api/patients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), drugs: drugs.map((d) => d.name) }),
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(45000),
       });
-      const data = (await r.json()) as { patient?: { id: string; name: string }; error?: string };
+      const data = (await r.json()) as {
+        patient?: { id: string; name: string };
+        alert?: { alerted: boolean; ok?: boolean; ref?: string; error?: string };
+        error?: string;
+      };
       if (!r.ok || !data.patient) throw new Error(data.error ?? `API ${r.status}`);
-      setNote({
-        tone: "ok",
-        text: `${data.patient.name} saved as ${data.patient.id} — the watcher checks them on its next pass.`,
-      });
+      const who = `${data.patient.name} saved as ${data.patient.id}`;
+      const a = data.alert;
+      if (a?.alerted && a.ok) {
+        const dry = a.ref?.startsWith("dry-run") ? " (dry run)" : "";
+        setNote({ tone: "ok", text: `${who} — recall alert sent to Slack ✓${dry}` });
+      } else if (a?.alerted) {
+        setNote({
+          tone: "warn",
+          text: `${who}, but the Slack alert failed — the watcher will retry on its next pass.`,
+        });
+      } else if (a?.error) {
+        setNote({
+          tone: "warn",
+          text: `${who}, but the recall check failed — the watcher will alert on its next pass.`,
+        });
+      } else {
+        setNote({ tone: "ok", text: `${who} — no active recalls; the watcher keeps checking.` });
+      }
       setName("");
       setDrugs([]);
       setDrugInput("");
@@ -196,7 +216,7 @@ export default function AddPatient() {
           className="btn solid"
           disabled={saving || !name.trim() || drugs.length === 0}
         >
-          {saving ? "Saving…" : "Add to registry"}
+          {saving ? "Saving + alerting…" : "Add to registry"}
         </button>
 
         {note && <p className={`addp-note ${note.tone}`}>{note.text}</p>}
@@ -287,7 +307,7 @@ function RecallGate({
           </button>
         </div>
         <p className="gate-foot">
-          If added, the watcher will alert this patient on its next pass.
+          If you add it and save the patient, the recall alert goes out immediately.
         </p>
       </div>
     </div>

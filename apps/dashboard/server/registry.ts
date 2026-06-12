@@ -186,7 +186,9 @@ export async function checkDrug(drug: string): Promise<DrugCheckResult> {
       `+OR+openfda.substance_name:"${v}"+OR+product_description:"${v}")`;
     const apiKey = process.env.OPENFDA_API_KEY;
     const auth = apiKey ? `&api_key=${encodeURIComponent(apiKey)}` : "";
-    const url = `${openFdaBase()}/drug/enforcement.json?search=${search}&limit=10${auth}`;
+    // limit=5: el mismo corte que usa el pipeline de alertas (packages/sources),
+    // para que el modal nunca advierta de un recall que luego no se alertaría.
+    const url = `${openFdaBase()}/drug/enforcement.json?search=${search}&limit=5${auth}`;
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (res.status === 404) {
       // openFDA responde 404 cuando no hay coincidencias: fármaco sin recalls.

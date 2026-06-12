@@ -18,7 +18,7 @@ class Guard extends Component<{ children: ReactNode }, { broken: boolean }> {
     return (
       <div className="crash">
         <span className="mark" aria-hidden="true" />
-        <h1>FarmacoVigía</h1>
+        <h1>FarmaWatcher</h1>
         <p>The interface hit an error. Events are still being recorded.</p>
         <button className="retry" onClick={() => location.reload()}>
           Retry

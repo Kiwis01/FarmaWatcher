@@ -135,6 +135,7 @@ export default function App() {
   const [details, setDetails] = useState<Record<string, DetailState>>({});
   const [openRecall, setOpenRecall] = useState<string | null>(null);
   const [wire, setWire] = useState<RecallWireResult | null>(null);
+  const [scope, setScope] = useState<"registry" | "all">("registry");
   const autoOpened = useRef(false);
 
   // Revelado escalonado solo en la primera carga; las filas nuevas entran sin retraso.
@@ -300,10 +301,29 @@ export default function App() {
     return s;
   }, [patients]);
 
-  const matchedRecallIds = useMemo(
-    () => new Set(recallCards.map((c) => c.id)),
-    [recallCards],
-  );
+  // El cable como dossiers: cada registro del modo "All drugs" ya viene completo
+  // del server, así que el detalle se sirve sin pedir nada más.
+  const wireCards = useMemo(() => {
+    if (!wire) return [];
+    const drugs = [...registryDrugs];
+    return wire.recalls.map((r) => {
+      const known = recallCards.find((c) => c.id === r.recall_number);
+      const hay = (r.product_description ?? "").toLowerCase();
+      const hit = !!known || drugs.some((d) => hay.includes(d));
+      const card: RecallCard = {
+        id: r.recall_number,
+        drug: known?.drug ?? recallDrugName(r),
+        cls: classOf(r.classification),
+        status: r.status,
+        sourceUrl: recallSourceUrl(r.recall_number),
+        reason: r.reason_for_recall,
+        seenAt: fdaDate(r.report_date),
+        patientIds: known?.patientIds ?? [],
+      };
+      const state: DetailState = { status: "ready", source: wire.source, record: r };
+      return { card, state, hit };
+    });
+  }, [wire, recallCards, registryDrugs]);
 
   const classCounts = useMemo(() => {
     const c: Record<string, number> = { I: 0, II: 0, III: 0 };
@@ -326,6 +346,22 @@ export default function App() {
   const visibleCards = patientFilter
     ? recallCards.filter((c) => c.patientIds.includes(patientFilter))
     : recallCards;
+
+  // Lo que muestra la columna principal según el selector: el padrón (eventos
+  // del agente) o el cable completo de la FDA. El filtro de paciente solo
+  // aplica al padrón; el cable es, por definición, de todos.
+  const shownCards =
+    scope === "all"
+      ? wireCards.map((w) => ({
+          ...w,
+          seenNote: w.hit ? "matches your patient registry" : "no registry patient takes this drug",
+        }))
+      : visibleCards.map((c) => ({
+          card: c,
+          state: details[c.id],
+          hit: false,
+          seenNote: undefined as string | undefined,
+        }));
 
   // Un boletín por paciente (el más reciente): el modo continuo regenera el mismo
   // boletín en cada pasada y la columna se llenaba de duplicados.
@@ -388,7 +424,7 @@ export default function App() {
           <div className="brand">
             <span className="mark" aria-hidden="true" />
             <div>
-              <h1>FarmacoVigía</h1>
+              <h1>FarmaWatcher</h1>
               <p>Event center · Pharmacovigilance</p>
             </div>
           </div>
@@ -434,28 +470,57 @@ export default function App() {
       <div className="grid">
         <section className="col-feed">
           <div className="sec-head">
-            <h2>Active recalls · openFDA</h2>
+            <h2>{scope === "registry" ? "Active recalls · your patients" : "FDA wire · every drug"}</h2>
+            <div className="seg" role="group" aria-label="Which recalls to show">
+              <button
+                className={scope === "registry" ? "on" : ""}
+                aria-pressed={scope === "registry"}
+                onClick={() => setScope("registry")}
+              >
+                My patients
+                <span className="n">{recallCards.length}</span>
+              </button>
+              <button
+                className={scope === "all" ? "on" : ""}
+                aria-pressed={scope === "all"}
+                onClick={() => setScope("all")}
+              >
+                All drugs
+                <span className="n">{wire ? wire.recalls.length : "…"}</span>
+              </button>
+            </div>
           </div>
-          {visibleCards.length === 0 ? (
+          {shownCards.length === 0 ? (
             <p className="empty">
-              {patientFilter
-                ? "This patient has no recalls on file."
-                : "No active recalls right now — the agent keeps watching openFDA."}
+              {scope === "all"
+                ? "Reaching openFDA for the latest recalls…"
+                : patientFilter
+                  ? "This patient has no recalls on file."
+                  : "No active recalls right now — the agent keeps watching openFDA."}
             </p>
           ) : (
-            <div className="dossiers">
-              {visibleCards.map((c) => (
+            <div className="dossiers" key={scope}>
+              {shownCards.map(({ card, state, hit, seenNote }) => (
                 <RecallDossier
-                  key={c.id}
-                  card={c}
-                  state={details[c.id]}
-                  open={openRecall === c.id}
-                  onToggle={() => setOpenRecall(openRecall === c.id ? null : c.id)}
+                  key={card.id}
+                  card={card}
+                  state={state}
+                  hit={hit}
+                  seenNote={seenNote}
+                  open={openRecall === card.id}
+                  onToggle={() => setOpenRecall(openRecall === card.id ? null : card.id)}
                   names={names}
                   onPatient={togglePatient}
                 />
               ))}
             </div>
+          )}
+          {scope === "all" && wire && (
+            <p className="wire-src">
+              {wire.source === "openfda"
+                ? "Live from openFDA · refreshed every 10 min"
+                : "openFDA unreachable — showing the local record set"}
+            </p>
           )}
 
           <div className="sec-head feed-head">
@@ -517,15 +582,6 @@ export default function App() {
           <section>
             <h2>Severity · what it means</h2>
             <SeverityLegend counts={classCounts} />
-          </section>
-
-          <section>
-            <h2>FDA wire · all drugs</h2>
-            <p className="wire-note">
-              The latest recalls published by the FDA — every drug, whether or not a
-              registry patient takes it.
-            </p>
-            <FdaWire wire={wire} registryDrugs={registryDrugs} matchedIds={matchedRecallIds} />
           </section>
 
           <section>
@@ -605,6 +661,14 @@ function rank(c: string): number {
   return c === "I" ? 0 : c === "II" ? 1 : 2;
 }
 
+/** "20260603" -> Date local (para seenAt de los recalls del cable). */
+function fdaDate(s?: string): Date {
+  if (s && /^\d{8}$/.test(s)) {
+    return new Date(Number(s.slice(0, 4)), Number(s.slice(4, 6)) - 1, Number(s.slice(6, 8)));
+  }
+  return new Date(0);
+}
+
 /**
  * El dossier de un retiro: cabecera siempre legible (fármaco, clase en palabras,
  * estado) y al expandir, todo el jugo de openFDA en lenguaje llano.
@@ -616,6 +680,8 @@ function RecallDossier({
   onToggle,
   names,
   onPatient,
+  hit = false,
+  seenNote,
 }: {
   card: RecallCard;
   state?: DetailState;
@@ -623,6 +689,8 @@ function RecallDossier({
   onToggle: () => void;
   names: Map<string, string>;
   onPatient: (id: string) => void;
+  hit?: boolean;
+  seenNote?: string;
 }) {
   const [allLots, setAllLots] = useState(false);
   const rec: RecallDetail | undefined = state?.status === "ready" ? state.record : undefined;
@@ -654,7 +722,7 @@ function RecallDossier({
         ? "record fetched live from openFDA"
         : "local fallback record"
       : null,
-    `first seen at ${hms(card.seenAt)}`,
+    seenNote ?? `first seen at ${hms(card.seenAt)}`,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -673,6 +741,11 @@ function RecallDossier({
           </span>
         </span>
         <span className="rc-tags">
+          {hit && (
+            <span className="rc-hit" title="A registry patient takes this drug.">
+              registry
+            </span>
+          )}
           <span className={`cls cls-${card.cls}`} title={meta.def}>
             Class {card.cls}
           </span>
@@ -817,75 +890,6 @@ function RecallDossier({
         </div>
       </div>
     </article>
-  );
-}
-
-/**
- * El cable openFDA: los últimos recalls publicados por la FDA, tomen o no
- * nuestros pacientes el fármaco. Los que sí cruzan con el padrón se marcan.
- */
-function FdaWire({
-  wire,
-  registryDrugs,
-  matchedIds,
-}: {
-  wire: RecallWireResult | null;
-  registryDrugs: Set<string>;
-  matchedIds: Set<string>;
-}) {
-  if (!wire) return <p className="empty">Reaching openFDA…</p>;
-
-  const drugs = [...registryDrugs];
-  return (
-    <>
-      <ol className="wire">
-        {wire.recalls.map((r) => {
-          const cls = classOf(r.classification);
-          const drug = recallDrugName(r);
-          const hay = `${drug} ${r.product_description ?? ""}`.toLowerCase();
-          const inRegistry =
-            matchedIds.has(r.recall_number) || drugs.some((d) => hay.includes(d));
-          const why = reasonGist(r.reason_for_recall) ?? clean(r.reason_for_recall);
-          const meta = [fmtFdaDate(r.report_date), clean(r.recalling_firm)]
-            .filter(Boolean)
-            .join(" · ");
-          return (
-            <li key={r.recall_number} className="wr">
-              <span className={`rn rn-${cls}`} title={CLASS_META[cls].def}>
-                {cls}
-              </span>
-              <div className="wr-body">
-                <div className="wr-line">
-                  <a
-                    className="wr-drug"
-                    href={recallSourceUrl(r.recall_number)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {drug}
-                  </a>
-                  {inRegistry && (
-                    <span
-                      className="wr-hit"
-                      title="A registry patient takes this drug — see Active recalls."
-                    >
-                      registry
-                    </span>
-                  )}
-                </div>
-                {why && <p className="wr-why">{why}</p>}
-                {meta && <div className="wr-meta">{meta}</div>}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-      <p className="wire-src">
-        {wire.source === "openfda"
-          ? "Live from openFDA · refreshed every 10 min"
-          : "openFDA unreachable — showing the local record set"}
-      </p>
-    </>
   );
 }
 
