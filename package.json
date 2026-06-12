@@ -9,7 +9,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "tsc --noEmit && npm run dashboard:build",
     "start": "npm run start -w @farmavigia/dashboard",
     "typecheck": "tsc --noEmit",
     "worker": "npm run start -w @farmavigia/worker",
