@@ -1,0 +1,27 @@
+{
+  "name": "farmacovigia",
+  "private": true,
+  "version": "0.1.0",
+  "description": "FarmacoVigía — agente de farmacovigilancia: vigila retiros FDA, cruza pacientes, alerta vía Slack/Gmail",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "api": "npm run start -w apps/api",
+    "api:dev": "npm run dev -w apps/api",
+    "notifier:demo": "npm run demo -w @farmacovigia/notifier"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.9"
+  }
+}
