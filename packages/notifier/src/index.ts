@@ -17,7 +17,11 @@ const gmailTo = () => process.env.COMPOSIO_GMAIL_TO || '';
 let _composio: Composio | null = null;
 function composio(): Composio {
   if (!_composio) {
-    _composio = new Composio({ apiKey: process.env.COMPOSIO_API_KEY });
+    const apiKey = process.env.COMPOSIO_API_KEY;
+    // Sin key, el SDK mata el proceso entero (TS-SDK::NO_API_KEY + exit 1);
+    // lanzar antes lo convierte en el fallback normal de postAlert.
+    if (!apiKey) throw new Error('COMPOSIO_API_KEY no configurado');
+    _composio = new Composio({ apiKey });
   }
   return _composio;
 }
