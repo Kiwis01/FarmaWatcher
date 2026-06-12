@@ -4,6 +4,7 @@ import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadEnv } from "./env";
 import { fetchEvents } from "./clickhouse";
+import { getRecallDetail, isValidRecallId } from "./recalls";
 
 loadEnv();
 
@@ -67,6 +68,26 @@ const server = createServer(async (req, res) => {
         "Cache-Control": "no-store",
       });
       res.end(JSON.stringify(data));
+      return;
+    }
+    if (url.startsWith("/api/recall/")) {
+      const id = decodeURIComponent(url.slice("/api/recall/".length).split("?")[0] ?? "");
+      if (!isValidRecallId(id)) {
+        res.writeHead(400, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: "recall id inválido" }));
+        return;
+      }
+      const detail = await getRecallDetail(id);
+      if (!detail) {
+        res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" });
+        res.end(JSON.stringify({ error: "recall no encontrado" }));
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "public, max-age=300",
+      });
+      res.end(JSON.stringify(detail));
       return;
     }
     if (url.startsWith("/healthz")) {
