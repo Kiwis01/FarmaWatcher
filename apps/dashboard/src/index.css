@@ -19,7 +19,7 @@
   /* Tinta marfil (nunca #fff) */
   --ink: oklch(0.93 0.009 45);
   --ink-2: oklch(0.73 0.014 45);
-  --ink-3: oklch(0.57 0.014 45);
+  --ink-3: oklch(0.62 0.014 45); /* mínimo AA 4.5:1 sobre --bg y --raise */
 
   /* Señal: el rojo se gana. Severidad por temperatura. */
   --red: oklch(0.65 0.2 28);
@@ -154,7 +154,7 @@ button {
 
 .brand {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
 }
 
@@ -162,6 +162,7 @@ button {
 .mark {
   width: 18px;
   height: 18px;
+  margin-top: 3px;
   border-radius: 50%;
   border: 1px solid var(--line-2);
   display: grid;
@@ -319,7 +320,7 @@ button {
 
 .sec-head {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--sp-md);
   flex-wrap: wrap;
@@ -359,9 +360,12 @@ button {
   color: var(--ink-2);
 }
 .chip.on {
-  color: var(--ink);
-  border-color: var(--line-2);
+  color: var(--ink-2);
+  border-color: var(--ink-3);
   background: var(--raise);
+}
+.chip.on:hover {
+  color: var(--ink);
 }
 
 /* ── Bitácora de eventos ─────────────────────────────────── */
@@ -384,7 +388,8 @@ button {
   grid-template-columns: 66px 78px 1fr;
   column-gap: var(--sp-md);
   align-items: start;
-  padding: 13px 6px;
+  padding: 13px 10px;
+  margin-inline: -10px;
   border-bottom: 1px solid var(--line);
   animation: ev-in 0.45s var(--ease) backwards;
   transition: background 0.15s;
@@ -406,6 +411,10 @@ button {
   color: var(--ink-3);
 }
 .k-recall .code {
+  color: var(--ink);
+}
+/* El rojo se gana: solo el recall Clase I enciende la bitácora */
+.k-recall.sev-I .code {
   color: var(--red);
 }
 .k-alert .code {
@@ -622,6 +631,7 @@ button {
   line-height: 1.7;
   color: var(--ink-2);
   white-space: pre-wrap;
+  overflow-wrap: break-word;
   max-width: 65ch;
 }
 

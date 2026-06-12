@@ -41,7 +41,7 @@ function Summary({ kind, d }: { kind: string; d: EventPayload }) {
         <>
           <strong>{d.name || d.patientId}</strong>
           {d.patientId && <span className="data">{d.patientId}</span>}
-          {d.drugs && d.drugs.length > 0 && <span>{d.drugs.join(", ")}</span>}
+          {Array.isArray(d.drugs) && d.drugs.length > 0 && <span>{d.drugs.join(", ")}</span>}
         </>
       );
     case "bulletin_generated":
@@ -79,6 +79,8 @@ export default function App() {
 
   useEffect(() => {
     let alive = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // setTimeout encadenado: las consultas nunca se traslapan ni se pisan.
     const load = async () => {
       try {
         const res = await fetchEvents();
@@ -88,27 +90,34 @@ export default function App() {
         setUpdated(hms(new Date()));
       } catch {
         if (alive) setOffline(true);
+      } finally {
+        if (alive) timer = setTimeout(load, 5000);
       }
     };
     load();
-    const id = setInterval(load, 5000);
     return () => {
       alive = false;
-      clearInterval(id);
+      clearTimeout(timer);
     };
   }, []);
 
   useEffect(() => {
     if (data) firstBatch.current = false;
+    if (delays.current.size > 2000) delays.current.clear();
   }, [data]);
 
-  const events = useMemo(
-    () =>
-      (data?.events ?? [])
-        .slice()
-        .sort((a, b) => toDate(b.ts).getTime() - toDate(a.ts).getTime()),
-    [data],
-  );
+  const events = useMemo(() => {
+    // Dedup por fila completa: el modo continuo re-inserta pasadas idénticas.
+    const seen = new Set<string>();
+    return (data?.events ?? [])
+      .filter((e) => {
+        const k = `${e.ts}|${e.kind}|${e.payload}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      })
+      .sort((a, b) => toDate(b.ts).getTime() - toDate(a.ts).getTime());
+  }, [data]);
 
   // Entidades únicas (para que las cifras no se inflen en modo continuo).
   const recallsById = useMemo(() => {
@@ -128,7 +137,7 @@ export default function App() {
       if (e.kind === "patient_matched" && d.patientId) {
         m.set(d.patientId, {
           name: d.name ?? d.patientId,
-          drugs: d.drugs ?? [],
+          drugs: Array.isArray(d.drugs) ? d.drugs : [],
           worst: m.get(d.patientId)?.worst ?? "III",
         });
       }
@@ -160,11 +169,22 @@ export default function App() {
     return true;
   });
 
-  const bulletins = events
-    .filter((e) => e.kind === "bulletin_generated")
-    .filter((e) => !patientFilter || parse(e.payload).patientId === patientFilter)
-    .map((e) => parse(e.payload))
-    .filter((d) => d.bulletin);
+  // Un boletín por paciente (el más reciente): el modo continuo regenera el mismo
+  // boletín en cada pasada y la columna se llenaba de duplicados.
+  const bulletins = useMemo(() => {
+    const seen = new Set<string>();
+    return events
+      .filter((e) => e.kind === "bulletin_generated")
+      .map((e) => parse(e.payload))
+      .filter(
+        (d) =>
+          d.bulletin &&
+          d.patientId &&
+          !seen.has(d.patientId) &&
+          (seen.add(d.patientId), true),
+      )
+      .filter((d) => !patientFilter || d.patientId === patientFilter);
+  }, [events, patientFilter]);
 
   const source = offline ? "offline" : (data?.source ?? "backup");
 
@@ -172,7 +192,7 @@ export default function App() {
     { label: "Eventos", value: events.length },
     { label: "Recalls únicos", value: recallsById.size },
     { label: "Pacientes afectados", value: patients.length },
-    { label: "Alertas enviadas", value: events.filter((e) => e.kind === "alert_sent").length },
+    { label: "Alertas · sesión", value: events.filter((e) => e.kind === "alert_sent").length },
   ];
 
   const toggleKind = (k: string) => {
@@ -248,10 +268,12 @@ export default function App() {
             </p>
           ) : (
             <ol className="feed">
-              {feed.map((e: EventRow, i: number) => {
+              {feed.slice(0, 120).map((e: EventRow, i: number) => {
                 const meta = KIND[e.kind] ?? { label: e.kind, code: e.kind, cls: "" };
                 const d = parse(e.payload);
                 const key = `${e.ts}|${e.kind}|${e.payload}`;
+                const sevI =
+                  e.kind === "recall_detected" && d.classification === "I" ? " sev-I" : "";
                 let delay = delays.current.get(key);
                 if (delay === undefined) {
                   delay = firstBatch.current ? Math.min(i, 14) * 40 : 0;
@@ -260,7 +282,7 @@ export default function App() {
                 return (
                   <li
                     key={key}
-                    className={`ev ${meta.cls}`}
+                    className={`ev ${meta.cls}${sevI}`}
                     style={delay ? { animationDelay: `${delay}ms` } : undefined}
                   >
                     <time className="t">{hms(toDate(e.ts))}</time>
@@ -322,10 +344,12 @@ export default function App() {
               </p>
             ) : (
               <div className="bulletins">
-                {bulletins.map((d, i) => (
-                  <article key={`${d.patientId}-${i}`} className="bull">
+                {bulletins.map((d) => (
+                  <article key={d.patientId} className="bull">
                     <div className="who">Paciente {d.patientId}</div>
-                    <p className="txt">{d.bulletin}</p>
+                    <p className="txt">
+                      {(d.bulletin ?? "").replace(/^[\s\p{Extended_Pictographic}️]+/u, "")}
+                    </p>
                   </article>
                 ))}
               </div>

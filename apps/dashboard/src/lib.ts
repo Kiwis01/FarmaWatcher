@@ -35,7 +35,8 @@ export const KIND: Record<string, { label: string; code: string; cls: string }> 
 
 export function parse(p: string): EventPayload {
   try {
-    return typeof p === "string" ? (JSON.parse(p) as EventPayload) : (p as EventPayload);
+    const v = typeof p === "string" ? JSON.parse(p) : p;
+    return v && typeof v === "object" && !Array.isArray(v) ? (v as EventPayload) : {};
   } catch {
     return {};
   }
@@ -68,7 +69,10 @@ export function rel(d: Date): string {
 }
 
 export async function fetchEvents(): Promise<EventsResult> {
-  const r = await fetch("/api/events", { cache: "no-store" });
+  const r = await fetch("/api/events", {
+    cache: "no-store",
+    signal: AbortSignal.timeout(4000),
+  });
   if (!r.ok) throw new Error("API " + r.status);
   return (await r.json()) as EventsResult;
 }
