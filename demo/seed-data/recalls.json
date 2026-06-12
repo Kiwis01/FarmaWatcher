@@ -1,0 +1,122 @@
+[
+  {
+    "recall_number": "D-1455-2019",
+    "classification": "Class II",
+    "status": "Ongoing",
+    "reason_for_recall": "CGMP Deviations: impurity for N-Nitroso-N-methyl-4-aminobutyric acid (NMBA) detected in the active pharmaceutical ingredient (API) used to manufacture finished products.",
+    "product_description": "LOSARTAN POTASSIUM 50 mg TABLET BULK  90 count bottles and 1000 count bottles, NDC 00591-3746-00",
+    "recalling_firm": "Teva Pharmaceuticals USA",
+    "city": "Parsippany",
+    "state": "NJ",
+    "country": "United States",
+    "voluntary_mandated": "Voluntary: Firm initiated",
+    "initial_firm_notification": "E-Mail",
+    "distribution_pattern": "Nationwide by 4 major distributors.",
+    "product_quantity": "2,924,000 tablets",
+    "recall_initiation_date": "20190606",
+    "center_classification_date": "20190709",
+    "report_date": "20190717",
+    "code_info": "Arrow Malta (Teva) Bulk Product Lot #  1169752A, exp. date 01/2020, 1000 tablets/bottle  1169753A, exp. date 01/2020, 90 tablets/bottle    Golden State Medical Finished Product Lot #  GS017387, exp. date 01/2020  GS017651, exp. date 01/2020  GS017479, exp. date 01/2020",
+    "openfda": {
+      "brand_name": ["Losartan Potassium"],
+      "generic_name": ["LOSARTAN POTASSIUM"],
+      "substance_name": ["LOSARTAN POTASSIUM"]
+    }
+  },
+  {
+    "recall_number": "D-0303-2019",
+    "classification": "Class II",
+    "status": "Ongoing",
+    "reason_for_recall": "CGMP Deviations: FDA laboratory testing confirmed presence of an impurity, N-nitrosodimethylamine (NDEA) in product.",
+    "product_description": "Amlodipine and Valsartan Tablets 5 mg/160 mg, (a) 30-count bottles (NDC 0093-7690-56) & 90-count bottles (NDC 0093-7690-98), RX Only, Manufactured In Israel By: TEVA PHARMACEUTICAL IND. LTD. Jerusalem, 9777402, Israel, Manufactured For: TEVA PHARMACEUTICALS USA, INC. North Wales, PA 19454.",
+    "recalling_firm": "Teva Pharmaceuticals USA",
+    "city": "North Wales",
+    "state": "PA",
+    "country": "United States",
+    "voluntary_mandated": "Voluntary: Firm initiated",
+    "initial_firm_notification": "Letter",
+    "distribution_pattern": "USA Nationwide including Puerto Rico.",
+    "product_quantity": "120,394 bottles",
+    "recall_initiation_date": "20181127",
+    "center_classification_date": "20181214",
+    "report_date": "20181219",
+    "code_info": "NDC 0093-7690-56 & NDC 0093-7690-98  Lot # 23X017, 23X018, 23X019, 23X020, 23X022, 23X023, 23X024",
+    "openfda": {
+      "brand_name": ["Amlodipine and Valsartan"],
+      "generic_name": ["AMLODIPINE AND VALSARTAN"],
+      "substance_name": ["AMLODIPINE BESYLATE", "VALSARTAN"]
+    }
+  },
+  {
+    "recall_number": "D-1349-2020",
+    "classification": "Class II",
+    "status": "Ongoing",
+    "reason_for_recall": "CGMP Deviations: FDA analysis detected N-Nitrosodimethylamine (NDMA) impurity above the acceptable intake level",
+    "product_description": "amneal Metformin Hydrochloride Extended-Release Tablets, USP, 750 mg, Rx only, 100 Tablets bottles, Manufactured by: Amneal Pharmaceuticals Pvt. Ltd. Ahmedabad, 388213, INDIA Distributed by: Amneal Pharmaceuticals LLC Bridgewater, NJ 08807   NDC 65162-179-10",
+    "recalling_firm": "Amneal Pharmaceuticals of New York, LLC",
+    "city": "Brookhaven",
+    "state": "NY",
+    "country": "United States",
+    "voluntary_mandated": "Voluntary: Firm initiated",
+    "initial_firm_notification": "Press Release",
+    "distribution_pattern": "Nationwide",
+    "product_quantity": "N/A",
+    "recall_initiation_date": "20200529",
+    "center_classification_date": "20200625",
+    "report_date": "20200701",
+    "code_info": "AM181337A 10/31/2020  AM181338A 10/31/2020  AM181339A 11/30/2020  AM181340A 11/30/2020  AM181341A 11/30/2020  AM181342A 11/30/2020  AM181343A 11/30/2020  AM181344A 11/30/2020  AM181356A 11/30/2020  AM181357A 11/30/2020  AM181358A 11/30/2020  AM181359A 11/30/2020  AM181360A 11/30/2020  AM181361A 11/30/2020  AM181362A 11/30/2020  AM181363A 11/30/2020  AM181415A 11/30/2020  AM190040B 12/31/2020  AM190041A 12/31/2020  AM190042A 12/31/2020  AM190043A 12/31/2020  AM190044A 12/31/2020  AM190045A 12/31/2020  AM190046A 12/31/2020  AM190473B 4/30/2021  AM190474A 4/30/2021  AM190475A 4/30/2021  AM190476A 4/30/2021  AM190477A 4/30/2021  AM190478A 4/30/2021  AM190479A 4/30/2021  AM190480A 4/30/2021  AM190481A 4/30/2021  AM190482A 4/30/2021  AM190834A 7/31/2021  AM190835A 7/31/2021  AM190836A 7/31/2021  AM190837A 7/31/2021  AM190838A 7/31/2021  AM191004A 8/31/2021  AM191005A 8/31/2021  AM191006A 8/31/2021  AM191007A 8/31/2021  AM191008A 9/30/2021  AM191271A 10/31/2021  AM191272A 10/31/2021  AM191273A 10/31/2021  AM191274A 10/31/2021  AM191338A 11/30/2021  AM191339A 11/30/2021  AM191340A 11/30/2021  AM191341 12/31/2021  AM191342 12/31/2021  AM200109 12/31/2021  AM200110 12/31/2021  AM200111 12/31/2021",
+    "openfda": {
+      "brand_name": ["METFORMIN HYDROCHLORIDE"],
+      "generic_name": ["METFORMIN HYDROCHLORIDE"],
+      "substance_name": ["METFORMIN HYDROCHLORIDE"]
+    }
+  },
+  {
+    "recall_number": "D-0632-2020",
+    "classification": "Class II",
+    "status": "Ongoing",
+    "reason_for_recall": "CGMP Deviations: Impurity N-nitrosodimethylamine (NDMA) found in API",
+    "product_description": "RANITIDINE TABLETS, USP 150mg, 10,000-count bag, Country of Origin: INDIA  NDC 62207-773-32",
+    "recalling_firm": "Granules India Limited",
+    "city": "Qutbullapur Mandal, Ranga Redd",
+    "state": "N/A",
+    "country": "India",
+    "voluntary_mandated": "Voluntary: Firm initiated",
+    "initial_firm_notification": "Letter",
+    "distribution_pattern": "OR, NY, NJ",
+    "product_quantity": "23,090,000 tablets",
+    "recall_initiation_date": "20191213",
+    "center_classification_date": "20191229",
+    "report_date": "20200108",
+    "code_info": "7730001A, 7730002A, 7730003A, 7730004A, 7730005A, 7730006A, 7730007A, 7730008A, 7730009A, 7730010A, 7730011A and 7730012A",
+    "openfda": {
+      "brand_name": ["RANITIDINE"],
+      "generic_name": ["RANITIDINE"],
+      "substance_name": ["RANITIDINE HYDROCHLORIDE"]
+    }
+  },
+  {
+    "recall_number": "D-0179-2025",
+    "classification": "Class I",
+    "status": "Ongoing",
+    "reason_for_recall": "Labeling: Label Error on Declared Strength; Some cartons were incorrectly labeled. The blister strips inside the product carton reflect the correct strength.",
+    "product_description": "Clonazepam Orally Disintegrating Tablets, USP, 0.125 mg, C-IV, Rx Only, 60 tablets per carton (10 blister cards containing 6 tablets each), Distributed by: PAR Pharmaceutical, Chestnut Ridge, NY 10977, NDC#: 49884-306-02 (carton), NDC #: 49884-306-52 (blisters).",
+    "recalling_firm": "Endo USA, Inc.",
+    "city": "Malvern",
+    "state": "PA",
+    "country": "United States",
+    "voluntary_mandated": "Voluntary: Firm initiated",
+    "initial_firm_notification": "Press Release",
+    "distribution_pattern": "Nationwide in the USA",
+    "product_quantity": "8,029 cartons",
+    "recall_initiation_date": "20241118",
+    "center_classification_date": "20250103",
+    "report_date": "20250115",
+    "code_info": "Lot #: 550174101, Exp. 01/31/2027.",
+    "openfda": {
+      "brand_name": ["CLONAZEPAM"],
+      "generic_name": ["CLONAZEPAM"],
+      "substance_name": ["CLONAZEPAM"]
+    }
+  }
+]

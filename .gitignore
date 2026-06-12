@@ -1,2 +1,13 @@
-node_modules
+node_modules/
+dist/
+*.tsbuildinfo
 .env
+.env.local
+*.log
+.DS_Store
+
+# Espejo local de eventos generado por el worker (runtime, no se versiona)
+demo/seed-data/events-live.json
+
+# Memoria de Claude (no va en el repo)
+memory/
