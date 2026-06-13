@@ -268,5 +268,460 @@
     "ts": "2026-06-12 23:00:46",
     "kind": "alert_sent",
     "payload": "{\"patientId\":\"PX-011\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-12 23:36:54",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-012\",\"drug\":\"Levothyroxine\",\"recallId\":\"D-0120-2025\",\"classification\":\"II\",\"reason\":\"Superpotent Drug and Subpotent Drug: potency failures obtained\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0120-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-12 23:36:54",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-012\",\"name\":\"Test 2\",\"drugs\":[\"Levothyroxine\"]}"
+  },
+  {
+    "ts": "2026-06-12 23:36:54",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-012\",\"chars\":865,\"bulletin\":\"## ⚠️ Medication Recall Alert for PX-012\\n\\n**Drug affected:** Levothyroxine (Recall D-0120-2025 | Manufacturer: Viatris Inc.)\\n\\n**What happened:** Some batches of your levothyroxine were found to have the wrong amount of active ingredient — either too much or too little. This means your thyroid condition may not be controlled properly.\\n\\n**Severity:** Class II — this recall may cause temporary or reversible health effects, but is not immediately life-threatening. (Class I is the most serious level.)\\n\\n**Check your packaging now.** Look at the lot number and expiration date on your bottle:\\n- Lot **8177720**, Exp. June 2025\\n- Lot **3200218**, Exp. June 2025\\n\\nIf your medication matches either lot, contact your pharmacist right away.\\n\\n**⚠️ Do not stop taking your medication without speaking to your doctor or pharmacist first.** Stopping suddenly can be harmful.\"}"
+  },
+  {
+    "ts": "2026-06-12 23:36:56",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-012\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"slack:1781307416.206349\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:12",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-013\",\"drug\":\"Irbesartan\",\"recallId\":\"D-0411-2019\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: FDA lab confirmed presence an impurity, N-nitrosodimethylamine (NDEA) contained in the API used to manufacture the product above the interim acceptable daily intake level of 0.083 parts per million.\",\"status\":\"Completed\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0411-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:12",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-013\",\"drug\":\"Irbesartan\",\"recallId\":\"D-0409-2019\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: FDA lab confirmed presence an impurity, N-nitrosodimethylamine (NDEA) contained in the API used to manufacture the product above the interim acceptable daily intake level of 0.083 parts per million.\",\"status\":\"Completed\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0409-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:12",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-013\",\"name\":\"Elena Vásquez\",\"drugs\":[\"Irbesartan\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:02:12",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-013\",\"chars\":842,\"bulletin\":\"**PATIENT ALERT — PX-013**\\n**Medication: Irbesartan**\\n\\nTwo lots of your irbesartan (made by Prinston Pharmaceutical Inc.) were recalled because laboratory testing found a chemical impurity called NDEA at levels above the accepted safe limit. NDEA is a probable human carcinogen, meaning long-term exposure may increase cancer risk.\\n\\n**Risk Class: Class II** — this means the risk of serious harm is unlikely, but the situation is not without concern.\\n\\n**Action — Check Your Packaging Now:**\\nLook at the lot number printed on your bottle or box. If it reads **327A18001, 327A18002, or 331B18009**, your medication may be affected.\\n\\n**Important:** Do **not** stop taking irbesartan on your own — stopping a blood pressure medication without guidance can be dangerous. Contact your doctor or pharmacist as soon as possible to discuss next steps.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:12",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-013\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:20",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-014\",\"drug\":\"Atorvastatin\",\"recallId\":\"D-0020-2026\",\"classification\":\"II\",\"reason\":\"Failed Dissolution Specifications\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0020-2026%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:20",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-014\",\"drug\":\"Atorvastatin\",\"recallId\":\"D-0511-2023\",\"classification\":\"II\",\"reason\":\"cGMP Deviations for the manufacturing Firm (Accord Healthcare) after their inspection.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0511-2023%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:20",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-014\",\"name\":\"Thomas O'Brien\",\"drugs\":[\"Atorvastatin\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:02:20",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-014\",\"chars\":863,\"bulletin\":\"**⚠ MEDICATION ALERT — Patient PX-014**\\n\\n**Atorvastatin (Cholesterol Medication)**\\n\\nTwo ongoing FDA recalls affect some atorvastatin tablets:\\n\\n1. **Recall D-0020-2026** (Ascend Laboratories): Tablets failed dissolution testing, meaning the medication may not dissolve properly and could be less effective. **Class II recall.**\\n\\n2. **Recall D-0511-2023** (Preferred Pharmaceuticals): Manufacturing quality standards were not met. **Class II recall.**\\n\\n**Class II** means the product is unlikely to cause serious harm, but there is a potential risk.\\n\\n**Please check your pill bottle now.** Look for these lot numbers: **25140249, 25140247** (Recall 1) or **A0523D, F14220, J0622Q** (Recall 2).\\n\\n**Do not stop taking your atorvastatin without speaking to your doctor or pharmacist first.** Stopping suddenly can be harmful. Contact your care team today for guidance.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:20",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-014\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:26",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-015\",\"drug\":\"Metformin\",\"recallId\":\"D-0292-2025\",\"classification\":\"II\",\"reason\":\"Presence of Foreign Tablets/Capsules.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0292-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:27",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-015\",\"name\":\"Priya Sharma\",\"drugs\":[\"Metformin\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:02:27",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-015\",\"chars\":782,\"bulletin\":\"**URGENT MEDICATION ALERT — Patient PX-015**\\n\\n**Medication Affected:** Metformin\\n\\nA batch of Metformin made by A-S Medication Solutions LLC has been recalled because bottles may contain wrong tablets or capsules mixed in — meaning you could accidentally take the wrong medication.\\n\\n**Risk Level:** Class II — this means there is a small but real chance of harm.\\n\\n**Action — Check Your Packaging Now:**\\nLook at your Metformin bottle for **Lot# 4260340** with an expiration date of **12/31/2025**. If your bottle matches, do **not** take any more tablets from it.\\n\\n**Important:** Do **not** stop your Metformin treatment on your own, as this can affect your blood sugar. Contact your doctor or pharmacist right away — they will arrange a safe replacement and advise you on next steps.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:27",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-015\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:38",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-016\",\"drug\":\"Losartan\",\"recallId\":\"D-1455-2019\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: impurity for N-Nitroso-N-methyl-4-aminobutyric acid (NMBA) detected in the active pharmaceutical ingredient (API) used to manufacture finished products.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-1455-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:38",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-016\",\"drug\":\"Hydrochlorothiazide\",\"recallId\":\"D-0301-2026\",\"classification\":\"II\",\"reason\":\"cGMP Deviations: recall due to not meeting the N-Nitroso Bisoprolol impurity specification limits.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0301-2026%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:38",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-016\",\"drug\":\"Hydrochlorothiazide\",\"recallId\":\"D-0332-2019\",\"classification\":\"II\",\"reason\":\"GCMP Deviations: FDA analysis confirmed presence of trace amounts of an impurity, N-nitrosodiethylamine (NDEA) found in the API used to manufacture the product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0332-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:38",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-016\",\"name\":\"Héctor Ramírez\",\"drugs\":[\"Losartan\",\"Hydrochlorothiazide\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:02:38",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-016\",\"chars\":908,\"bulletin\":\"# ⚠️ Medication Recall Alert for Patient PX-016\\n\\n**Affected medications:** Losartan & Hydrochlorothiazide\\n\\n**What happened:** Several lots of your Losartan and Hydrochlorothiazide have been recalled because they may contain low levels of nitrosamine impurities (NMBA, NDEA, or N-Nitroso Bisoprolol) — chemicals that could pose a health risk with long-term exposure. These recalls are rated **Class II**, meaning the risk of serious harm is unlikely but possible.\\n\\n**Check your packaging now:**\\n- Losartan — Lot **1169752A**, exp. **01/2020**\\n- Hydrochlorothiazide — Lots **GBHL24005A** (exp. 09/2026), **3084860–3084863**\\n\\nIf your medication matches any of these lot numbers, contact your pharmacist immediately.\\n\\n⚠️ **Do not stop taking your medication on your own.** Stopping blood pressure treatment without guidance can be dangerous. Please speak with your doctor or pharmacist before making any changes.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:38",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-016\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:45",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-018\",\"drug\":\"Valsartan\",\"recallId\":\"D-0332-2019\",\"classification\":\"II\",\"reason\":\"GCMP Deviations: FDA analysis confirmed presence of trace amounts of an impurity, N-nitrosodiethylamine (NDEA) found in the API used to manufacture the product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0332-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:45",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-018\",\"drug\":\"Valsartan\",\"recallId\":\"D-0330-2019\",\"classification\":\"II\",\"reason\":\"GCMP Deviations: FDA analysis confirmed presence of trace amounts of an impurity, N-nitrosodiethylamine (NDEA) found in the API used to manufacture the product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0330-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:45",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-018\",\"drug\":\"Valsartan\",\"recallId\":\"D-0303-2019\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: FDA laboratory testing confirmed presence of an impurity, N-nitrosodimethylamine (NDEA) in product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0303-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:46",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-018\",\"drug\":\"Carvedilol\",\"recallId\":\"D-0451-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations; presence 'N-Nitroso Carvedilol I' Impurity above the recommended acceptable intake limit\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0451-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:46",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-018\",\"drug\":\"Carvedilol\",\"recallId\":\"D-0450-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations; presence 'N-Nitroso Carvedilol I' Impurity above the recommended acceptable intake limit\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0450-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:46",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-018\",\"drug\":\"Carvedilol\",\"recallId\":\"D-0578-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Presence of a nitrosamine,  N-Nitroso Carvedilol I  Impurity above the current Acceptable Intake Level.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0578-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:46",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-018\",\"drug\":\"Carvedilol\",\"recallId\":\"D-0216-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations:N-Nitroso Carvedilol I impurity (NNCI-I) were found to be failing per current FDA recommended limit.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0216-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:46",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-018\",\"name\":\"Samuel Greene\",\"drugs\":[\"Valsartan\",\"Carvedilol\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:02:46",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-018\",\"chars\":917,\"bulletin\":\"# ⚠️ Medication Recall Alert — Patient PX-018\\n\\n**Medications affected: Valsartan & Carvedilol**\\n\\n---\\n\\n**What happened:** Both of your medications have been recalled because testing found nitrosamine impurities (NDEA in Valsartan; N-Nitroso Carvedilol I in Carvedilol) above safe levels. Nitrosamines are chemicals that may increase cancer risk with long-term exposure.\\n\\n**Risk Class: Class II** — this means the risk of serious harm is unlikely, but the situation still requires action.\\n\\n**Check your packaging now.** Compare your lot numbers against those listed for Valsartan (e.g., 3084860–3093804, Teva lots 23X017–23X019) and Carvedilol (e.g., Glenmark lots 19231107, 19234\\\\*, 19243202, 17230658). If your lot matches, contact your pharmacist immediately.\\n\\n**⚠️ Do not stop taking either medication on your own.** Stopping suddenly can be dangerous. Please call your doctor or pharmacist right away for guidance.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:46",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-018\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:53",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-019\",\"drug\":\"Levothyroxine\",\"recallId\":\"D-0120-2025\",\"classification\":\"II\",\"reason\":\"Superpotent Drug and Subpotent Drug: potency failures obtained\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0120-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:53",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-019\",\"drug\":\"Omeprazole\",\"recallId\":\"D-0525-2025\",\"classification\":\"II\",\"reason\":\"Presence of foreign tablets/capsules: presence of foreign Divalproex Sodium Extended-Release 250mg tablet in a bottle of omeprazole capsules.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0525-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:53",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-019\",\"name\":\"Alicia Mendoza\",\"drugs\":[\"Levothyroxine\",\"Omeprazole\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:02:53",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-019\",\"chars\":914,\"bulletin\":\"# ⚠️ Medication Recall Alert for Patient PX-019\\n\\n---\\n\\n## Levothyroxine (Recall D-0120-2025 | Class II)\\nViatris Inc. has recalled certain levothyroxine lots because the tablets may be stronger or weaker than stated, meaning your thyroid condition may not be properly controlled. **Please check your packaging for Lot #8177720 or Lot #3200218 (both expiring Jun 2025).** If your medication matches, contact your pharmacist right away — but **do not stop taking it without speaking to your doctor first.**\\n\\n---\\n\\n## Omeprazole (Recall D-0525-2025 | Class II)\\nDr. Reddy's Laboratories recalled this omeprazole lot because a bottle may accidentally contain a Divalproex Sodium tablet, which is a different medication entirely. **Check your packaging for Lot C2403017 (expiring 12/31/2026).** If your lot matches, contact your pharmacist — but **do not stop treatment without consulting your doctor or pharmacist first.**\"}"
+  },
+  {
+    "ts": "2026-06-13 00:02:53",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-019\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:00",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-020\",\"drug\":\"Rosuvastatin\",\"recallId\":\"D-0520-2023\",\"classification\":\"II\",\"reason\":\"cGMP Deviations for the manufacturing Firm (Accord Healthcare) after their inspection.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0520-2023%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:00",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-020\",\"drug\":\"Rosuvastatin\",\"recallId\":\"D-0339-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0339-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:00",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-020\",\"drug\":\"Clopidogrel\",\"recallId\":\"D-0513-2023\",\"classification\":\"II\",\"reason\":\"cGMP Deviations for the manufacturing Firm (Accord Healthcare) after their inspection.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0513-2023%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:00",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-020\",\"name\":\"David Kim\",\"drugs\":[\"Rosuvastatin\",\"Clopidogrel\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:00",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-020\",\"chars\":850,\"bulletin\":\"# ⚠️ Medication Recall Alert — Patient PX-020\\n\\n**Affected medications: Rosuvastatin & Clopidogrel**\\n\\n---\\n\\n**What happened:** Certain batches of your Rosuvastatin and Clopidogrel were recalled because the manufacturers did not follow required quality standards (cGMP) during production. These are **Class II** recalls, meaning the risk of serious harm is unlikely, but some risk exists.\\n\\n**Check your packaging now:**\\n- **Rosuvastatin** — check for lot numbers such as A1723C, A1922B, D0622M, 17240389, 17240390, or 17240426.\\n- **Clopidogrel** — check for lot numbers E0922W, G1222E, I0922W, or K3022W.\\n\\nIf your lot number matches, contact your pharmacist immediately for a replacement.\\n\\n---\\n\\n> 🚫 **Do not stop taking either medication on your own.** Both are important for your health. Speak with your doctor or pharmacist before making any changes.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:00",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-020\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:07",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-021\",\"drug\":\"Metformin\",\"recallId\":\"D-0292-2025\",\"classification\":\"II\",\"reason\":\"Presence of Foreign Tablets/Capsules.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0292-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:08",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-021\",\"name\":\"Fatima Al-Rashid\",\"drugs\":[\"Metformin\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:08",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-021\",\"chars\":800,\"bulletin\":\"**URGENT MEDICATION ALERT — Patient PX-021**\\n\\n**Recalled Medication: Metformin**\\nRecall #D-0292-2025 | Issued: 25 Feb 2025\\n\\nA batch of Metformin made by A-S Medication Solutions LLC has been recalled because some bottles may contain the wrong tablets or capsules mixed in. Taking the wrong medication by mistake could cause unexpected side effects.\\n\\n**Risk Level: Class II** — This means there is a small but real chance of harm. (Class I is the most serious level.)\\n\\n**Check your packaging now:**\\nLook at your bottle label for **Lot # 4260340** and an expiry date of **12/31/2025**. If your bottle matches, do **not** take any more tablets from it.\\n\\n⚠️ **Do NOT stop your Metformin treatment on your own.** Contact your doctor or pharmacist right away — they will arrange a safe replacement for you.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:08",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-021\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:15",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-023\",\"drug\":\"Duloxetine\",\"recallId\":\"D-0101-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Presence of N-nitroso-duloxetine impurity above the recommended interim limit\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0101-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:15",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-023\",\"drug\":\"Duloxetine\",\"recallId\":\"D-0552-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Presence of N-nitroso-duloxetine impurity above safety assessment limit\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0552-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:15",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-023\",\"drug\":\"Duloxetine\",\"recallId\":\"D-0161-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: presence of N-nitroso-duloxetine impurity above FDA recommended interim limit.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0161-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:15",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-023\",\"name\":\"Carmen Ortega\",\"drugs\":[\"Duloxetine\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:15",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-023\",\"chars\":842,\"bulletin\":\"## ⚠️ Medication Alert for Patient PX-023\\n\\n**Drug affected:** Duloxetine\\n\\nSeveral batches of duloxetine have been recalled because they contain a chemical impurity called N-nitroso-duloxetine at levels higher than what is considered safe. This impurity may pose a low risk of harm with long-term exposure.\\n\\n**Risk Class: Class II** (a possible but unlikely cause of serious harm — not the most serious level).\\n\\n**Please check your packaging now.** The recalled lot numbers are:\\n- **DT6022159A, DT6022167A, DT6022168A** (exp. 11/30/2024)\\n- **222205C** (exp. 11/2025)\\n- **230836C** (exp. 02/28/2026)\\n\\nIf your bottle matches any of these lots, contact your pharmacist immediately.\\n\\n**Do not stop taking duloxetine on your own** — stopping suddenly can be harmful. Speak with your doctor or pharmacist first; they will arrange a safe replacement.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:15",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-023\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:21",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-024\",\"drug\":\"Albuterol\",\"recallId\":\"D-0444-2025\",\"classification\":\"II\",\"reason\":\"Defective delivery system\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0444-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:22",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-024\",\"drug\":\"Montelukast\",\"recallId\":\"D-0518-2023\",\"classification\":\"II\",\"reason\":\"cGMP Deviations for the manufacturing Firm (Accord Healthcare) after their inspection.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0518-2023%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:22",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-024\",\"name\":\"Liam Murphy\",\"drugs\":[\"Albuterol\",\"Montelukast\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:22",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-024\",\"chars\":882,\"bulletin\":\"# ⚠️ Medication Recall Alert — Patient PX-024\\n\\n**Two of your medications are affected by active FDA recalls.**\\n\\n---\\n\\n**Albuterol (Recall D-0444-2025 | Class II)**\\nYour albuterol inhaler may have a defective delivery system, meaning it might not deliver the correct dose of medication. Please check your packaging for lot numbers **6270044C00, 6270040D00, or 6270034E00** (expiry 10/2026).\\n\\n---\\n\\n**Montelukast (Recall D-0518-2023 | Class II)**\\nYour montelukast may have been manufactured under substandard conditions, which could affect its quality. Check your packaging for lot numbers **F3021D** or **L0722T**.\\n\\n---\\n\\n**Class II** means there is a possible risk of harm, though it is not immediately life-threatening.\\n\\n🔴 **Do not stop either medication on your own.** Contact your doctor or pharmacist right away to check your specific lot and arrange a safe replacement if needed.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:22",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-024\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:30",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-025\",\"drug\":\"Amlodipine\",\"recallId\":\"D-0542-2025\",\"classification\":\"II\",\"reason\":\"Labeling: Incorrect or Missing Lot and/or Exp Date: released with wrong expiry date as Feb.2027 instead of Jan.2027\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0542-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:30",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-025\",\"drug\":\"Amlodipine\",\"recallId\":\"D-0303-2019\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: FDA laboratory testing confirmed presence of an impurity, N-nitrosodimethylamine (NDEA) in product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0303-2019%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:30",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-025\",\"drug\":\"Simvastatin\",\"recallId\":\"D-0523-2023\",\"classification\":\"II\",\"reason\":\"cGMP Deviations for the manufacturing Firm (Accord Healthcare) after their inspection.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0523-2023%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:31",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-025\",\"name\":\"Rosa Delgado\",\"drugs\":[\"Amlodipine\",\"Simvastatin\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:31",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-025\",\"chars\":923,\"bulletin\":\"## ⚠️ Medication Recall Alert — Patient PX-025\\n\\n**Amlodipine (Lupin, Recall D-0542-2025 | Class II)**\\nSome bottles were released with a wrong expiry date printed on the label (shows Feb 2027, should be Jan 2027). **Check your packaging for Lot GB01616 / Expiry 2/28/2027.** If it matches, contact your pharmacist.\\n\\n**Amlodipine (Teva, Recall D-0303-2019 | Class II)**\\nFDA testing found a potentially harmful impurity (NDEA) in certain lots. **Check for NDC 0093-7690-56 or 0093-7690-98, Lots 23X017, 23X018, or 23X019.** If your bottle matches, contact your pharmacist promptly.\\n\\n**Simvastatin (Preferred Pharmaceuticals, Recall D-0523-2023 | Class II)**\\nManufacturing quality standards were not met. **Check for Lots B0222S, F1121B, or G2721L.** If your bottle matches, speak with your pharmacist.\\n\\n> 🚨 **Do not stop taking any medication on your own.** Always consult your doctor or pharmacist before making any changes.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:31",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-025\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:37",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-026\",\"drug\":\"Pantoprazole\",\"recallId\":\"D-0540-2023\",\"classification\":\"II\",\"reason\":\"CGMP Deviations; The impacted product and lot number was inadvertently placed into saleable inventory, which does not comply with approved procedures.\",\"status\":\"Completed\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0540-2023%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:37",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-026\",\"name\":\"Kenji Watanabe\",\"drugs\":[\"Pantoprazole\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:37",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-026\",\"chars\":849,\"bulletin\":\"**MEDICATION RECALL ALERT — Patient PX-026**\\n\\n**Drug affected:** Pantoprazole (manufactured by Methapharm Inc.)\\n\\nCertain batches of your pantoprazole were recalled because the manufacturer accidentally placed product that did not meet quality standards into stock for sale, which goes against approved procedures. This is a **Class II recall**, meaning the risk of serious harm is low, but there is a potential for temporary or reversible health effects.\\n\\n**Check your packaging now.** If your bottle or box shows any of these lot numbers — **220801, 220802, or 220803** — with an expiry of **July 2024**, your medication may be affected.\\n\\n**Do not stop taking your medication on your own**, as this could affect your health. Please contact your doctor or pharmacist as soon as possible to check your supply and arrange a safe replacement if needed.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:37",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-026\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:44",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-027\",\"drug\":\"Sertraline\",\"recallId\":\"D-0205-2024\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Inadequate line clearance which may result in a potential comingling of product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0205-2024%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:44",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-027\",\"drug\":\"Trazodone\",\"recallId\":\"D-0305-2026\",\"classification\":\"II\",\"reason\":\"Presence of Foreign Tablets/Capsules\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0305-2026%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:44",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-027\",\"drug\":\"Trazodone\",\"recallId\":\"D-0247-2026\",\"classification\":\"III\",\"reason\":\"Failed Tablet/Capsule Specifications: Product complaint received that some tablets had a dent on the plain side of the tablet surface.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0247-2026%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:44",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-027\",\"name\":\"Isabel Fuentes\",\"drugs\":[\"Sertraline\",\"Trazodone\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:44",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-027\",\"chars\":889,\"bulletin\":\"# ⚠️ Medication Recall Alert — Patient PX-027\\n\\n**Sertraline** (Legacy Pharmaceutical Packaging LLC) has been recalled because of manufacturing process errors that may have caused different medications to be mixed together. This is a **Class II** recall (moderate risk). **Check your bottle for Lot #222033, expiry 08/31/2024.**\\n\\n**Trazodone** is subject to two recalls:\\n- *Zydus Pharmaceuticals* recalled tablets with physical dents (**Class III** — lower risk). Check for **Lot #EA00237A, expiry 04/30/2027.**\\n- *Granules Pharmaceuticals* recalled tablets that may contain **foreign tablets mixed in** (**Class II** — moderate risk). Check for **Batch #6160008A, expiry 12/31/2026.**\\n\\n**Please do not stop taking your medication without speaking to your doctor or pharmacist first.** They can quickly confirm whether your specific lot is affected and arrange a safe replacement if needed.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:44",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-027\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:51",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-028\",\"drug\":\"Finasteride\",\"recallId\":\"D-0262-2025\",\"classification\":\"II\",\"reason\":\"CGMP Deviations\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0262-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:51",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-028\",\"name\":\"Walter Briggs\",\"drugs\":[\"Finasteride\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:03:51",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-028\",\"chars\":880,\"bulletin\":\"## ⚠️ Medication Recall Alert — Patient PX-028\\n\\n**Affected Medication: Finasteride**\\n\\nA batch of finasteride made by Aspen Biopharma Labs has been recalled (Recall D-0262-2025, issued 7 February 2025) because the manufacturer did not follow required quality and safety standards during production (known as CGMP deviations). This means the tablets may not meet quality standards, though no serious harm has been reported at this time.\\n\\n**Risk Level: Class II** — this means the chance of serious harm is low, but a risk cannot be ruled out.\\n\\n**Action — check your packaging now:**\\nLook at the lot number printed on your finasteride bottle or box. If it reads **HAFSC0040923** (exp. Aug 2027) or **HAFSC0050923**, your medication may be affected.\\n\\n**Do not stop taking finasteride on your own.** Please contact your doctor or pharmacist before making any changes to your treatment.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:51",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-028\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:59",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-031\",\"drug\":\"Ranitidine\",\"recallId\":\"D-0643-2020\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Presence of NDMA impurity detected in product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0643-2020%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:59",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-031\",\"drug\":\"Ranitidine\",\"recallId\":\"D-0171-2020\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Presence of NDMA impurity detected in product.\",\"status\":\"Completed\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0171-2020%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:03:59",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-031\",\"drug\":\"Ranitidine\",\"recallId\":\"D-0642-2020\",\"classification\":\"II\",\"reason\":\"CGMP Deviations: Presence of NDMA impurity detected in product.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0642-2020%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:04:00",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-031\",\"drug\":\"Esomeprazole\",\"recallId\":\"D-0443-2025\",\"classification\":\"II\",\"reason\":\"Failed Impurities/Degradation Specifications: Out-of-Specification test results obtained for any individual unknown degradation product during Related Compounds testing during long term stability.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0443-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:04:00",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-031\",\"name\":\"Lucía Herrera\",\"drugs\":[\"Ranitidine\",\"Esomeprazole\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:04:00",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-031\",\"chars\":1019,\"bulletin\":\"# ⚠️ Medication Recall Alert — Patient PX-031\\n\\n**Two of your medications are affected by active FDA recalls.**\\n\\n---\\n\\n**Ranitidine** (manufacturers: Glenmark Pharmaceuticals & Dr. Reddy's Laboratories) was recalled because an impurity called NDMA — a probable human carcinogen — was found in the product. **Risk Class: II.** Please check your packaging for lot numbers beginning with **7701069A, 7701070A, 7701084A, 7701085A, 7701087A, 7701094A, 7701095A, 7701030A, 7701031A, 7701062A, 7701063A, 7701110A, 7701111A, 7701112A**, or any lot from Dr. Reddy's within its expiry date.\\n\\n**Esomeprazole** (Zydus Pharmaceuticals) was recalled due to a degradation product found at unacceptable levels during stability testing. **Risk Class: II.** Check your packaging for lot numbers **M402147** (exp. 10/2025), **M311637** (exp. 07/2025), or **M402495** (exp. 02/2025).\\n\\n**Please do not stop either medication on your own.** Contact your doctor or pharmacist right away to check your specific lot and discuss safe alternatives.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:04:00",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-031\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
+  },
+  {
+    "ts": "2026-06-13 00:04:07",
+    "kind": "recall_detected",
+    "payload": "{\"patientId\":\"PX-032\",\"drug\":\"Metformin\",\"recallId\":\"D-0292-2025\",\"classification\":\"II\",\"reason\":\"Presence of Foreign Tablets/Capsules.\",\"status\":\"Ongoing\",\"sourceUrl\":\"https://api.fda.gov/drug/enforcement.json?search=recall_number:%22D-0292-2025%22\"}"
+  },
+  {
+    "ts": "2026-06-13 00:04:07",
+    "kind": "patient_matched",
+    "payload": "{\"patientId\":\"PX-032\",\"name\":\"Frank Delaney\",\"drugs\":[\"Metformin\"]}"
+  },
+  {
+    "ts": "2026-06-13 00:04:07",
+    "kind": "bulletin_generated",
+    "payload": "{\"patientId\":\"PX-032\",\"chars\":843,\"bulletin\":\"**URGENT MEDICATION ALERT — Patient PX-032**\\n\\n**Recalled Medication: Metformin**\\nRecall #D-0292-2025 | Issued: 25 Feb 2025\\n\\nA batch of Metformin made by A-S Medication Solutions LLC has been recalled because some bottles may contain the wrong tablets or capsules mixed in. Taking the wrong medication by mistake could cause unexpected side effects.\\n\\n**Risk Level: Class II** — This means the risk of serious harm is unlikely, but the situation should still be taken seriously.\\n\\n**Check your packaging now:**\\nLook at your bottle label for **Lot # 4260340** with an expiry of **12/31/2025**. If your bottle matches, stop using that supply immediately.\\n\\n**Important:** Do **not** stop taking your Metformin without speaking to your doctor or pharmacist first. They will arrange a safe replacement so your treatment continues without interruption.\"}"
+  },
+  {
+    "ts": "2026-06-13 00:04:07",
+    "kind": "alert_sent",
+    "payload": "{\"patientId\":\"PX-032\",\"channel\":\"slack\",\"ok\":true,\"ref\":\"dry-run:slack\"}"
   }
 ]
