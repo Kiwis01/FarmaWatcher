@@ -53,17 +53,19 @@ export interface LatestRecallsResult {
   recalls: RecallRecord[];
 }
 
-// La FDA publica el enforcement report en tandas (≈semanal), pero el cable
-// acumula: una pasada por minuto contra openFDA suma lo nuevo a un almacén
-// en memoria, así la lista crece en vez de mostrar solo la última página.
-// El almacén vive con el proceso: se re-siembra con la página más reciente
-// tras cada deploy/reinicio.
+// La FDA publica el enforcement report en tandas (≈semanal), así que revisar
+// solo "lo último" cada minuto deja la lista plana entre tandas. El cable hace
+// dos cosas por pasada: revisa la página más reciente (capta tandas nuevas al
+// minuto) y rellena una página de recalls más viejos (skip incremental), de
+// modo que el almacén crece ~WIRE_PAGE por minuto hasta WIRE_MAX.
+// El almacén vive con el proceso: se re-siembra tras cada deploy/reinicio.
 const WIRE_POLL_MS = Math.max(30, Number(process.env.WIRE_POLL_SEC ?? 60)) * 1000;
 const WIRE_PAGE = 100;
 const WIRE_MAX = 1000;
 const wireStore = new Map<string, RecallRecord>();
 let wireSource: LatestRecallsResult["source"] = "seed";
 let wirePoller: ReturnType<typeof setInterval> | null = null;
+let wireSkip = WIRE_PAGE; // próximo offset de backfill hacia recalls más viejos
 
 function seedAsLatest(limit: number): LatestRecallsResult {
   const rows = [...seed().values()].sort(byReportDateDesc).slice(0, limit);
@@ -74,29 +76,41 @@ function byReportDateDesc(a: RecallRecord, b: RecallRecord): number {
   return String(b.report_date ?? "").localeCompare(String(a.report_date ?? ""));
 }
 
-async function refreshWire(): Promise<void> {
+async function fetchWirePage(skip: number): Promise<RecallRecord[] | null> {
   try {
     const key = process.env.OPENFDA_API_KEY;
     const auth = key ? `&api_key=${encodeURIComponent(key)}` : "";
     const url =
       `${openFdaBase()}/drug/enforcement.json` +
-      `?sort=report_date:desc&limit=${WIRE_PAGE}${auth}`;
+      `?sort=report_date:desc&limit=${WIRE_PAGE}&skip=${skip}${auth}`;
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
-    if (!res.ok) return;
+    if (!res.ok) return null;
     const data = (await res.json()) as { results?: RecallRecord[] };
-    for (const r of data.results ?? []) {
-      if (r.recall_number && !wireStore.has(r.recall_number)) {
-        wireStore.set(r.recall_number, r);
-      }
-    }
-    if (data.results?.length) wireSource = "openfda";
-    if (wireStore.size > WIRE_MAX) {
-      const keep = [...wireStore.values()].sort(byReportDateDesc).slice(0, WIRE_MAX);
-      wireStore.clear();
-      for (const r of keep) wireStore.set(r.recall_number, r);
-    }
+    return data.results ?? [];
   } catch {
     // Offline o timeout: la próxima pasada reintenta; mientras, se sirve lo acumulado.
+    return null;
+  }
+}
+
+function mergeWire(rows: RecallRecord[]): void {
+  for (const r of rows) {
+    if (r.recall_number && !wireStore.has(r.recall_number)) {
+      wireStore.set(r.recall_number, r);
+    }
+  }
+  if (rows.length) wireSource = "openfda";
+}
+
+async function refreshWire(): Promise<void> {
+  const latest = await fetchWirePage(0);
+  if (latest) mergeWire(latest);
+  if (wireStore.size < WIRE_MAX) {
+    const older = await fetchWirePage(wireSkip);
+    if (older?.length) {
+      mergeWire(older);
+      wireSkip += WIRE_PAGE;
+    }
   }
 }
 
