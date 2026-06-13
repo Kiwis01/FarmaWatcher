@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { checkDrugSafety } from "@farmavigia/sources";
+import { chTarget } from "./clickhouse";
 import { postAlert } from "@farmavigia/notifier";
 import type { Alert } from "@farmavigia/shared";
 import type { Patient } from "./registry";
@@ -33,12 +34,12 @@ function nowDateTime(): string {
 async function logClickHouse(row: Row): Promise<void> {
   const base = process.env.CLICKHOUSE_URL;
   if (!base) return;
-  const sep = base.includes("?") ? "&" : "?";
-  const url = `${base}${sep}query=${encodeURIComponent("INSERT INTO events FORMAT JSONEachRow")}`;
+  const { url, headers } = chTarget(base);
+  url.searchParams.set("query", "INSERT INTO events FORMAT JSONEachRow");
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       body: JSON.stringify(row),
     });
     if (!res.ok) throw new Error(`${res.status}`);

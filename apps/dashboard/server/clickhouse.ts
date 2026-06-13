@@ -39,7 +39,7 @@ function fallback(error?: string): EventsResult {
 
 // fetch() rechaza URLs con credenciales embebidas (https://user:pass@host),
 // así que las separamos a un header Basic. También acepta CLICKHOUSE_USER/PASSWORD.
-function chTarget(base: string): { url: URL; headers: Record<string, string> } {
+export function chTarget(base: string): { url: URL; headers: Record<string, string> } {
   const url = new URL(base);
   const user = decodeURIComponent(url.username) || process.env.CLICKHOUSE_USER || "";
   const pass = decodeURIComponent(url.password) || process.env.CLICKHOUSE_PASSWORD || "";
