@@ -171,7 +171,8 @@ export default function App() {
     if (delays.current.size > 2000) delays.current.clear();
   }, [data]);
 
-  // El cable openFDA: el server cachea 10 min, así que el poll puede ser lento.
+  // El cable openFDA: el server acumula con una pasada por minuto, así que
+  // el front repolea al mismo ritmo para que la lista crezca sola.
   useEffect(() => {
     let alive = true;
     const load = () =>
@@ -181,7 +182,7 @@ export default function App() {
         })
         .catch(() => {});
     load();
-    const timer = setInterval(load, 10 * 60 * 1000);
+    const timer = setInterval(load, 60 * 1000);
     return () => {
       alive = false;
       clearInterval(timer);

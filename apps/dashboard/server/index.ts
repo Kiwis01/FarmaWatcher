@@ -81,7 +81,7 @@ const server = createServer(async (req, res) => {
     }
     if (url.startsWith("/api/recalls/latest")) {
       const raw = Number(new URL(url, "http://x").searchParams.get("limit"));
-      const limit = Number.isFinite(raw) && raw > 0 ? Math.min(raw, 100) : 50;
+      const limit = Number.isFinite(raw) && raw > 0 ? Math.min(raw, 500) : 200;
       const data = await getLatestRecalls(limit);
       res.writeHead(200, {
         "Content-Type": "application/json; charset=utf-8",
