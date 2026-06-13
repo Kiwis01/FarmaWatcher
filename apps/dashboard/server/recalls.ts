@@ -57,7 +57,7 @@ export interface LatestRecallsResult {
 // para una pantalla en vivo sin acercarse al rate limit.
 const WIRE_OK_TTL_MS = 10 * 60 * 1000;
 const WIRE_FAIL_TTL_MS = 60 * 1000;
-let wireCache: { at: number; value: LatestRecallsResult } | null = null;
+let wireCache: { at: number; limit: number; value: LatestRecallsResult } | null = null;
 
 function seedAsLatest(limit: number): LatestRecallsResult {
   const rows = [...seed().values()]
@@ -66,10 +66,13 @@ function seedAsLatest(limit: number): LatestRecallsResult {
   return { source: "seed", recalls: rows };
 }
 
-export async function getLatestRecalls(limit = 12): Promise<LatestRecallsResult> {
-  if (wireCache) {
+export async function getLatestRecalls(limit = 50): Promise<LatestRecallsResult> {
+  if (wireCache && wireCache.limit >= limit) {
     const ttl = wireCache.value.source === "openfda" ? WIRE_OK_TTL_MS : WIRE_FAIL_TTL_MS;
-    if (Date.now() - wireCache.at < ttl) return wireCache.value;
+    if (Date.now() - wireCache.at < ttl) {
+      const v = wireCache.value;
+      return v.recalls.length > limit ? { ...v, recalls: v.recalls.slice(0, limit) } : v;
+    }
   }
 
   let value: LatestRecallsResult | null = null;
@@ -88,7 +91,7 @@ export async function getLatestRecalls(limit = 12): Promise<LatestRecallsResult>
     // Offline o timeout: degradamos al fixture local.
   }
   if (!value) value = seedAsLatest(limit);
-  wireCache = { at: Date.now(), value };
+  wireCache = { at: Date.now(), limit, value };
   return value;
 }
 
