@@ -174,7 +174,7 @@ export interface RecallWireResult {
 
 /** Los últimos recalls que publicó la FDA (con fixture local como respaldo). */
 export async function fetchRecallWire(): Promise<RecallWireResult> {
-  const r = await fetch("/api/recalls/latest", {
+  const r = await fetch("/api/recalls/latest?limit=1000", {
     cache: "no-store",
     signal: AbortSignal.timeout(10000),
   });
